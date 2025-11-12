@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Agent Dashboard</title>
+    <style>
+      body { font-family: Inter, Arial, sans-serif; margin: 0; padding: 0; background:#f3f4f6; }
+      .container { max-width: 1000px; margin: 24px auto; padding: 16px; }
+      header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+      .card { background: white; border-radius:8px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,0.08); margin-bottom:12px; }
+      button { background:#1f2937; color:white; padding:8px 12px; border:none; border-radius:6px; cursor:pointer; }
+      input, textarea, select { width:100%; padding:8px; border:1px solid #e5e7eb; border-radius:6px; }
+      .row { display:flex; gap:12px; }
+      .col { flex:1; }
+      .small { font-size:13px; color:#374151; }
+      .agent-item { cursor:pointer; padding:8px; border-radius:6px; border:1px solid #e5e7eb; margin-bottom:8px; }
+      .agent-selected { border-color:#60a5fa; background: linear-gradient(90deg,#eff6ff,#fff); }
+      .chat-box { height: 300px; overflow:auto; border:1px solid #e5e7eb; padding:8px; border-radius:6px; background:white; }
+      .message.user { text-align:right; }
+      .message.agent { text-align:left; }
+      .tok { font-family:monospace; background:#f3f4f6; padding:4px 6px; border-radius:4px; }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

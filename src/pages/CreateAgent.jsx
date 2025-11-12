@@ -5,8 +5,7 @@ import { useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import { HexColorPicker } from "react-colorful";
 import "../styles/createagent.css";
-import { db } from "../firebase";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { createAgent } from "../api"; // make sure api.js is in src/
 
 export default function CreateAgentPage() {
   const navigate = useNavigate();
@@ -22,37 +21,7 @@ export default function CreateAgentPage() {
 
   const handleLogoClick = () => navigate("/");
 
-  const handleCreateAgent = async () => {
-    if (!agentName || !summary || !guidelines) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    try {
-      const agentData = {
-        name: agentName,
-        emoji: selectedEmoji,
-        color: selectedColor,
-        specialties: specialties,
-        summary: summary,
-        guidelines: guidelines,
-        createdAt: Timestamp.now(),
-      };
-
-      console.log("📝 Attempting to add agent:", agentData);
-
-      const docRef = await addDoc(collection(db, "agents"), agentData);
-      console.log("✅ Agent added with ID:", docRef.id);
-
-      alert("Agent created successfully!");
-      setShowModal(false);
-      navigate("/agent-chat");
-    } catch (error) {
-      console.error("🔥 Error creating agent:", error);
-      alert("Failed to create agent: " + error.message);
-    }
-  };
-
+  // === Fix: define handleAddSpecialty ===
   const handleAddSpecialty = () => {
     if (newSpecialty.trim() !== "") {
       setSpecialties([...specialties, newSpecialty.trim()]);
@@ -64,6 +33,34 @@ export default function CreateAgentPage() {
   const handleRemoveSpecialty = (index) => {
     const updated = specialties.filter((_, i) => i !== index);
     setSpecialties(updated);
+  };
+
+  const handleCreateAgent = async () => {
+    if (!agentName || !summary || !guidelines) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      const agentData = {
+        name: agentName,
+        role: summary,
+        persona: guidelines,
+        allowed_sources: specialties,
+        tools: [],
+      };
+
+      console.log("🚀 Sending agent data to backend:", agentData);
+      const response = await createAgent(agentData);
+      console.log("✅ Agent created:", response);
+
+      alert("Agent created successfully!");
+      setShowModal(false);
+      navigate("/agent-chat"); // redirect to chat page
+    } catch (error) {
+      console.error("🔥 Error creating agent:", error);
+      alert("Failed to create agent: " + error.message);
+    }
   };
 
   return (
@@ -106,7 +103,6 @@ export default function CreateAgentPage() {
             </button>
           </div>
 
-          {/* === Agent Summary === */}
           <label>Write a quick summary of your agent’s function.</label>
           <div className="input-with-counter">
             <input
@@ -122,7 +118,6 @@ export default function CreateAgentPage() {
           <label>Configure your agent’s behavior and preferences.</label>
           <div className="specialize-row">
             <p>This agent specializes in</p>
-
             {!showInput ? (
               <button className="add-btn" onClick={() => setShowInput(true)}>
                 + Add
@@ -155,10 +150,7 @@ export default function CreateAgentPage() {
             ))}
           </div>
 
-          {/* === Agent Guidelines === */}
-          <label>
-            Define your agent’s role, personality, and behavior guidelines.
-          </label>
+          <label>Define your agent’s role, personality, and behavior guidelines.</label>
           <div className="input-with-counter textarea-wrapper">
             <textarea
               maxLength="500"
@@ -177,13 +169,13 @@ export default function CreateAgentPage() {
             <option>Web Scraper</option>
           </select>
 
-          {/* Button now opens modal */}
-          <button className="create-btn" onClick={() => setShowModal(true)}>
-            Create
+          {/* Only this button creates the agent */}
+          <button className="create-btn" onClick={handleCreateAgent}>
+            Create Agent
           </button>
         </div>
 
-        {/* === ICON PICKER MODAL === */}
+        {/* ICON PICKER MODAL */}
         {showModal && (
           <div className="modal-overlay" onClick={() => setShowModal(false)}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
@@ -206,7 +198,7 @@ export default function CreateAgentPage() {
               </div>
 
               <button className="create-btn" onClick={handleCreateAgent}>
-                Create
+                Create Agent
               </button>
             </div>
           </div>

@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+pydantic
+python-dotenv
+sentence-transformers
+faiss-cpu
+numpy
+openai
+python-multipart
+pytest
+pytest-asyncio
+requests
+pdfplumber
+PyJWT

@@ -1,0 +1,4 @@
+[tool.poetry]
+name = "ai-agent-engine"
+version = "0.1.0"
+description = "RAG AI Agent Engine"
