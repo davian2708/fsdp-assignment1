@@ -13,13 +13,23 @@ from datetime import datetime, timedelta
 
 app = FastAPI(title='AI Agent Engine')
 
+# -------------------
+# FIXED CORS SETTINGS
+# -------------------
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "*"   # Allow all for development
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# -------------------
 
 # Simple API key / JWT auth dependency
 def verify_api_key(x_api_key: str = Header(None)):

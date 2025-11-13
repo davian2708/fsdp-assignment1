@@ -1,5 +1,5 @@
 const API_BASE_URL = "http://localhost:8000"; // backend running locally
-const API_KEY = "<eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjE3OTQ0OTIwMDN9.jUxk-xhIhJHFijWKTtTQAFIiiSDJhMO19XceqryQohM>";
+const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjE3OTQ1NzU5ODN9.baZmdIL7LBNHU34uAokJ5j-D563yJbWu_VwY8iMjDGM";
 
 export async function createAgent(agentData) {
   const res = await fetch(`${API_BASE_URL}/agents`, {

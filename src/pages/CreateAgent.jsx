@@ -5,10 +5,13 @@ import { useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import { HexColorPicker } from "react-colorful";
 import "../styles/createagent.css";
-import { createAgent } from "../api"; // make sure api.js is in src/
+
+import { db } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 export default function CreateAgentPage() {
   const navigate = useNavigate();
+
   const [showModal, setShowModal] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState("🤖");
   const [selectedColor, setSelectedColor] = useState("#3a3a3a");
@@ -21,9 +24,8 @@ export default function CreateAgentPage() {
 
   const handleLogoClick = () => navigate("/");
 
-  // === Fix: define handleAddSpecialty ===
   const handleAddSpecialty = () => {
-    if (newSpecialty.trim() !== "") {
+    if (newSpecialty.trim()) {
       setSpecialties([...specialties, newSpecialty.trim()]);
       setNewSpecialty("");
       setShowInput(false);
@@ -31,10 +33,10 @@ export default function CreateAgentPage() {
   };
 
   const handleRemoveSpecialty = (index) => {
-    const updated = specialties.filter((_, i) => i !== index);
-    setSpecialties(updated);
+    setSpecialties(specialties.filter((_, i) => i !== index));
   };
 
+  // 🚀 Create agent in FIREBASE (NOT FastAPI)
   const handleCreateAgent = async () => {
     if (!agentName || !summary || !guidelines) {
       alert("Please fill in all required fields.");
@@ -44,22 +46,26 @@ export default function CreateAgentPage() {
     try {
       const agentData = {
         name: agentName,
-        role: summary,
+        summary: summary,
         persona: guidelines,
-        allowed_sources: specialties,
+        specialties: specialties,
+        icon: selectedEmoji,
+        color: selectedColor,
         tools: [],
+        createdAt: serverTimestamp(),
       };
 
-      console.log("🚀 Sending agent data to backend:", agentData);
-      const response = await createAgent(agentData);
-      console.log("✅ Agent created:", response);
+      // Save to Firestore
+      const docRef = await addDoc(collection(db, "agents"), agentData);
 
       alert("Agent created successfully!");
       setShowModal(false);
-      navigate("/agent-chat"); // redirect to chat page
+
+      // Redirect to chat with Firestore agent ID
+      navigate(`/agent-chat/${docRef.id}`);
     } catch (error) {
       console.error("🔥 Error creating agent:", error);
-      alert("Failed to create agent: " + error.message);
+      alert("Failed to create agent.");
     }
   };
 
@@ -118,6 +124,7 @@ export default function CreateAgentPage() {
           <label>Configure your agent’s behavior and preferences.</label>
           <div className="specialize-row">
             <p>This agent specializes in</p>
+
             {!showInput ? (
               <button className="add-btn" onClick={() => setShowInput(true)}>
                 + Add
@@ -137,7 +144,6 @@ export default function CreateAgentPage() {
             )}
           </div>
 
-          {/* Show added specialties */}
           <div className="tag-container">
             {specialties.map((item, index) => (
               <div key={index} className="tag">
@@ -150,7 +156,9 @@ export default function CreateAgentPage() {
             ))}
           </div>
 
-          <label>Define your agent’s role, personality, and behavior guidelines.</label>
+          <label>
+            Define your agent’s role, personality, and behavior guidelines.
+          </label>
           <div className="input-with-counter textarea-wrapper">
             <textarea
               maxLength="500"
@@ -169,7 +177,6 @@ export default function CreateAgentPage() {
             <option>Web Scraper</option>
           </select>
 
-          {/* Only this button creates the agent */}
           <button className="create-btn" onClick={handleCreateAgent}>
             Create Agent
           </button>

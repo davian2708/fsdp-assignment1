@@ -1,0 +1,9 @@
+{
+  "id": "abc467dd-cae2-4c77-ba43-d5eddd443720",
+  "name": "qf",
+  "role": "fq",
+  "persona": "fq",
+  "allowed_sources": [],
+  "tools": [],
+  "max_retrieval": 5
+}
