@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import { HexColorPicker } from "react-colorful";
 import "../styles/createagent.css";
+import logo from '../assets/Flying Bot Logo.png';
 
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
@@ -36,7 +37,7 @@ export default function CreateAgentPage() {
     setSpecialties(specialties.filter((_, i) => i !== index));
   };
 
-  // 🚀 Create agent in FIREBASE (NOT FastAPI)
+  //  Create agent in FIREBASE (NOT FastAPI)
   const handleCreateAgent = async () => {
     if (!agentName || !summary || !guidelines) {
       alert("Please fill in all required fields.");
@@ -64,7 +65,7 @@ export default function CreateAgentPage() {
       // Redirect to chat with Firestore agent ID
       navigate(`/agent-chat/${docRef.id}`);
     } catch (error) {
-      console.error("🔥 Error creating agent:", error);
+      console.error(" Error creating agent:", error);
       alert("Failed to create agent.");
     }
   };
@@ -77,10 +78,10 @@ export default function CreateAgentPage() {
         {/* Header */}
         <div className="dashboard-header">
           <div className="logo-container" onClick={handleLogoClick}>
-            <img
-              src="/src/assets/Flying Bot Logo.png"
-              alt="Logo"
-              className="logo"
+            <img 
+              src={logo} 
+              alt="Logo" 
+              className="logo" 
             />
           </div>
           <button className="settings-btn">
@@ -183,10 +184,12 @@ export default function CreateAgentPage() {
         </div>
 
         {/* ICON PICKER MODAL */}
+                {/* === ICON PICKER MODAL === */}
         {showModal && (
           <div className="modal-overlay" onClick={() => setShowModal(false)}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
               <h3>Select Icon & Colour</h3>
+
 
               <EmojiPicker
                 onEmojiClick={(emoji) => setSelectedEmoji(emoji.emoji)}
@@ -204,8 +207,8 @@ export default function CreateAgentPage() {
                 />
               </div>
 
-              <button className="create-btn" onClick={handleCreateAgent}>
-                Create Agent
+              <button className="save-btn" onClick={() => setShowModal(false)}>
+                Save
               </button>
             </div>
           </div>

@@ -3,54 +3,55 @@
   display: flex;
   height: 100vh;
   width: 100%;
-  background: #121212;
-  color: #fff;
+  background: #1e1e1e; 
+  color: #e0e0e0; 
   font-family: "Inter", sans-serif;
 }
 
-/* === FORM === */
+/* === FORM CONTAINER (The Card) === */
 .form-container {
-  background: #1e1e1e;
+  background: #252525; 
   border-radius: 12px;
   padding: 30px;
-  border: 1px solid #2a2a2a;
+  border: 1px solid #3a3a3a; 
   max-width: 800px;
 }
 
 .form-container h2 {
   font-size: 22px;
   margin-bottom: 20px;
-  color: #fff;
+  color: #ffffff;
 }
 
 .form-container p {
   margin-bottom: 20px;
-  color: #fff;
+  color: #cccccc; 
 }
 
 label {
   display: block;
-  color: #b0b0b0;
+  color: #c0c0c0; 
   margin-bottom: 8px;
   margin-top: 18px;
 }
 
+/* === INPUTS, TEXTAREAS, SELECTS === */
 input,
 textarea,
 select {
   width: 90%;
   padding: 12px 15px;
-  background: #2b2b2b;
-  border: 1px solid #333;
+  background: #333333; 
+  border: 1px solid #4a4a4a; 
   border-radius: 8px;
-  color: #fff;
+  color: #ffffff;
   font-size: 15px;
   margin-bottom: 10px;
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: #777;
+  color: #999; 
 }
 
 textarea {
@@ -60,15 +61,22 @@ textarea {
 
 .row {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  gap: 15px;
+  align-items: flex-end;
 }
 
+.row input[type="text"] {
+  flex-grow: 1;
+  height: 50px;
+  padding: 0 20px;
+}
+
+/* === SMALL BUTTONS (Icon, Add) === */
 .icon-btn,
 .add-btn {
-  background: #2b2b2b;
+  background: #333333; 
   color: #fff;
-  border: 1px solid #333;
+  border: 1px solid #4a4a4a;
   border-radius: 8px;
   padding: 10px 16px;
   cursor: pointer;
@@ -77,13 +85,13 @@ textarea {
 
 .icon-btn:hover,
 .add-btn:hover {
-  background: #3a3a3a;
+  background: #4a4a4a; 
 }
 
-/* === CREATE BUTTON === */
+/* === CREATE BUTTON (Primary Action) === */
 .create-btn {
-  background: #e0e0e0;
-  color: #000;
+  background: #007bff; 
+  color: #fff; 
   font-weight: 600;
   border: none;
   padding: 12px 28px;
@@ -94,20 +102,22 @@ textarea {
 }
 
 .create-btn:hover {
-  background: #ffffff;
+  background: #0056b3; 
 }
 
-/* === ICON PREVIEW === */
-.icon-preview {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
+/* === ICON PREVIEW BUTTON === */
+.icon-preview-btn {
+  flex-shrink: 0;
+  width: 90px;
+  height: 90px;
+  border: 1px solid #4a4a4a; 
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;       
+  align-items: center; 
   justify-content: center;
-  align-items: center;
-  margin: 10px 0 20px 0;
-  font-size: 36px;
-  color: #fff;
+  font-size: 50px;
+  line-height: 1;
 }
 
 .modal-overlay {
@@ -121,20 +131,21 @@ textarea {
   justify-content: center;
   align-items: center;
   z-index: 20;
-}
+} 
+
 
 .modal {
-  background: #1e1e1e;
+  background: #252525; 
   padding: 25px 30px;
   border-radius: 12px;
-  border: 1px solid #2a2a2a;
+  border: 1px solid #3a3a3a;
   width: 400px;
   color: #fff;
 }
 
 .save-btn {
-  background: #e0e0e0;
-  color: #000;
+  background: #007bff; 
+  color: #fff;
   border: none;
   padding: 10px 20px;
   border-radius: 8px;
@@ -144,26 +155,13 @@ textarea {
 }
 
 .save-btn:hover {
-  background: #ffffff;
+  background: #0056b3;
 }
 
-/* === SPECIALTIES SECTION === */
-.specialize-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 5px;
-}
-
-.add-specialty-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+/* === SPECIALTIES SECTION (Tags) === */
 .add-specialty-box input {
-  background: #2b2b2b;
-  border: 1px solid #333;
+  background: #333333;
+  border: 1px solid #4a4a4a;
   border-radius: 6px;
   color: #fff;
   padding: 8px 10px;
@@ -171,8 +169,8 @@ textarea {
 }
 
 .save-tag-btn {
-  background: #e0e0e0;
-  color: #000;
+  background: #007bff; 
+  color: #fff;
   border: none;
   border-radius: 6px;
   padding: 8px 14px;
@@ -182,33 +180,25 @@ textarea {
 }
 
 .save-tag-btn:hover {
-  background: #fff;
+  background: #0056b3;
 }
 
 /* === TAG DISPLAY === */
-.tag-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
 .tag {
-  background: #2b2b2b;
+  background: #3a3a3a; 
   color: #fff;
   padding: 6px 12px;
   border-radius: 6px;
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #333;
+  border: 1px solid #4a4a4a;
   font-size: 14px;
 }
 
 .remove-tag {
   cursor: pointer;
-  color: #aaa;
+  color: #ccc; 
   transition: color 0.2s;
 }
 
@@ -217,26 +207,10 @@ textarea {
 }
 
 /* === CHARACTER COUNTERS === */
-.input-with-counter {
-  position: relative;
-  width: 100%;
-}
-
 .input-with-counter input,
 .input-with-counter textarea {
-  width: 100%;
-  padding: 12px 15px;
-  background: #2b2b2b;
-  border: 1px solid #333;
-  border-radius: 8px;
-  color: #fff;
-  font-size: 15px;
-  box-sizing: border-box;
-}
-
-.textarea-wrapper textarea {
-  height: 120px;
-  resize: none;
+  background: #333333;
+  border: 1px solid #4a4a4a;
 }
 
 .char-counter {
@@ -244,13 +218,13 @@ textarea {
   bottom: 8px;
   right: 12px;
   font-size: 13px;
-  color: #999;
+  color: #b0b0b0; 
   pointer-events: none;
 }
 
 /* Focus outline */
 .input-with-counter input:focus,
 .input-with-counter textarea:focus {
-  outline: 1px solid #007bff;
+  outline: 1px solid #007bff; 
   border-color: #007bff;
 }

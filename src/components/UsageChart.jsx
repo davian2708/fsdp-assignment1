@@ -31,23 +31,23 @@ export default function UsageChart() {
           >
             <XAxis
               dataKey="day"
-              stroke="#555"
+              stroke="#777" 
               tickLine={false}
               tick={{ fontSize: 13, fill: "#555" }}
             />
             <YAxis
-              stroke="#555"
+              stroke="#777" 
               tickLine={false}
-              axisLine={{ stroke: "#ddd" }}
+              axisLine={{ stroke: "#e0e0e0" }} 
               tick={{ fontSize: 13, fill: "#555" }}
             />
 
             <Tooltip
               cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
               contentStyle={{
-                backgroundColor: "#fff",
+                backgroundColor: "#ffffff",
                 borderRadius: "8px",
-                border: "1px solid #ddd",
+                border: "1px solid #e0e0e0", 
                 color: "#111",
                 padding: "8px 12px",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
@@ -56,12 +56,11 @@ export default function UsageChart() {
               labelStyle={{ fontWeight: 600, color: "#333" }}
             />
 
-
             <Bar
               dataKey="usage"
-              fill="#888" 
+              fill="#4a4a4a" 
               radius={[6, 6, 0, 0]}
-              activeBar={{ fill: "#000" }} 
+              activeBar={{ fill: "#fffff" }} 
             />
           </BarChart>
         </ResponsiveContainer>

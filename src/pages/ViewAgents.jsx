@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/SideBar";
 import "../styles/viewagents.css";
 import { useNavigate } from "react-router-dom";
+import logo from '../assets/Flying Bot Logo.png';
 
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
@@ -9,6 +10,7 @@ import { FiSettings } from "react-icons/fi";
 
 export default function ViewAgents() {
   const navigate = useNavigate();
+  const handleLogoClick = () => navigate("/");
 
   const [agents, setAgents] = useState([]);
   const [search, setSearch] = useState("");
@@ -42,7 +44,9 @@ export default function ViewAgents() {
 
       <div className="view-panel">
         {/* Top logo area */}
-        <div className="view-logo">LOGO</div>
+        <div className="view-logo" onClick={handleLogoClick}>
+          <img src={logo} alt="Logo" className="logo" />
+        </div>
 
         <h1 className="view-title">Your AI Agents</h1>
 

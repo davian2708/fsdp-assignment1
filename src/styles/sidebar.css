@@ -2,14 +2,14 @@
 .sidebar {
   width: 250px;
   height: 100vh;
-  background: #111;
+  background: #1a1a1a; 
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   padding: 25px 20px;
-  color: #fff;
+  color: #e0e0e0; 
   box-sizing: border-box;
-  border-right: 1px solid #222;
+  border-right: 1px solid #333; 
   flex-shrink: 0;
 }
 
@@ -25,8 +25,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #222;
-  color: #fff;
+  background: #2a2a2a; 
+  color: #e0e0e0; 
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,8 +41,8 @@
 
 /* === CREATE NEW AGENT BUTTON === */
 .create-agent-btn {
-  background: #222;
-  color: #fff;
+  background: #3a3a3a; 
+  color: #ffffff;
   font-weight: bold;
   border: none;
   border-radius: 6px;
@@ -50,11 +50,11 @@
   width: 100%;
   cursor: pointer;
   transition: 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .create-agent-btn:hover {
-  background:  #666;
+  background: #4a4a4a; 
   transform: translateY(-1px);
 }
 
@@ -72,17 +72,17 @@
   border: none;
   border-radius: 6px;
   padding: 10px 0;
-  color: #fff;
+  color: #e0e0e0;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
-  background-color: #222;
+  background-color: #2a2a2a; 
 }
 
 
 .menu-btn:hover {
-   background-color: #666;
+  background-color: #3a3a3a; 
   transform: translateY(-1px);
-  filter: brightness(1.2);
+  filter: none; 
 }

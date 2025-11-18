@@ -3,6 +3,7 @@ import Sidebar from "../components/SideBar";
 import "../styles/chatinterface.css";
 import { FiArrowLeft, FiEdit2, FiSend, FiUpload, FiMic } from "react-icons/fi";
 import { useParams, useNavigate } from "react-router-dom";
+import logo from '../assets/Flying Bot Logo.png';
 
 import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -10,7 +11,7 @@ import { doc, getDoc } from "firebase/firestore";
 export default function ChatInterface() {
   const { agentId } = useParams();
   const navigate = useNavigate();
-
+  const handleLogoClick = () => navigate("/");
   const [agent, setAgent] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -46,12 +47,6 @@ export default function ChatInterface() {
       <Sidebar />
 
       <div className="chat-panel">
-
-        {/* === TOP AREA (Logo space) === */}
-        <div className="top-logo-area">
-          <div className="logo-placeholder">LOGO</div>
-        </div>
-
         {/* === AGENT HEADER CARD === */}
         <div className="agent-header">
           <button className="back-btn" onClick={() => navigate(-1)}>

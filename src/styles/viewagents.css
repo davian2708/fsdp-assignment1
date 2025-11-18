@@ -2,8 +2,8 @@
   display: flex;
   height: 100vh;
   width: 100%;
-  background: #121212;
-  color: white;
+  background: #1e1e1e; 
+  color: #e0e0e0; 
 }
 
 .view-panel {
@@ -12,14 +12,25 @@
   overflow-y: auto;
 }
 
+/* --- LOGO --- */
 .view-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 10px;
   text-align: center;
   font-size: 26px;
   font-weight: bold;
-  background: #222;
   padding: 10px 30px;
   border-radius: 8px;
   margin-bottom: 30px;
+}
+
+.view-logo-img {
+  height: 30px; 
+  width: auto; 
+  display: block; 
+  margin: 0 auto; 
 }
 
 .view-title {
@@ -27,19 +38,21 @@
   margin-bottom: 20px;
 }
 
+/* --- SEARCH & INPUT --- */
 .view-search {
   width: 60%;
   margin: 0 auto;
   display: block;
   padding: 14px 20px;
   border-radius: 12px;
-  border: 1px solid #444;
-  background: #1c1c1c;
-  color: white;
+  border: 1px solid #4a4a4a; 
+  background: #2a2a2a; 
+  color: #f0f0f0; 
   font-size: 16px;
   margin-bottom: 25px;
 }
 
+/* --- BUTTON & FILTER --- */
 .view-filters {
   display: flex;
   justify-content: center;
@@ -48,19 +61,20 @@
 }
 
 .filter-btn {
-  background: #1c1c1c;
+  background: #2a2a2a; 
   padding: 10px 18px;
   border-radius: 20px;
-  color: white;
-  border: 1px solid #333;
+  color: #f0f0f0;
+  border: 1px solid #4a4a4a; 
   cursor: pointer;
 }
 
 .filter-btn.active {
-  background: white;
-  color: black;
+  background: #f0f0f0; 
+  color: #1e1e1e; 
 }
 
+/* --- AGENT CARD --- */
 .agents-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -69,8 +83,8 @@
 }
 
 .agent-card {
-  background: #1a1a1a;
-  border: 1px solid #333;
+  background: #232323; 
+  border: 1px solid #4a4a4a; 
   padding: 18px;
   border-radius: 12px;
   display: flex;
@@ -81,13 +95,13 @@
 }
 
 .agent-card:hover {
-  background: #222;
+  background: #333333; 
 }
 
 .agent-image-box {
   width: 90px;
   height: 90px;
-  background: #2b2b2b;
+  background: #3a3a3a; 
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -104,16 +118,16 @@
 
 .agent-info p {
   margin: 2px 0 6px 0;
-  color: #aaa;
+  color: #cccccc; 
 }
 
 .agent-created {
   font-size: 12px;
-  color: #777;
+  color: #999999; 
 }
 
 .agent-settings {
   margin-left: auto;
-  color: #ccc;
+  color: #dddddd;
   cursor: pointer;
 }
