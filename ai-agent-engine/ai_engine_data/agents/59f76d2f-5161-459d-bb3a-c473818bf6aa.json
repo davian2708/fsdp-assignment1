@@ -1,9 +1,0 @@
-{
-  "id": "59f76d2f-5161-459d-bb3a-c473818bf6aa",
-  "name": "qfg",
-  "role": "gq",
-  "persona": "gq",
-  "allowed_sources": [],
-  "tools": [],
-  "max_retrieval": 5
-}

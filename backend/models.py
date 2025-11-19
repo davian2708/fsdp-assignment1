@@ -7,6 +7,8 @@ class AgentCreateRequest(BaseModel):
     persona: Optional[str] = ""
     specialties: Optional[List[str]] = []
     guidelines: Optional[str] = ""
+    color: Optional[str] = "#3a3a3a"
+    icon: Optional[str] = "🤖"
 
 class ChatRequest(BaseModel):
     agent_id: str

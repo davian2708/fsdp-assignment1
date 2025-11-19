@@ -1,9 +1,0 @@
-{
-  "id": "8fed8616-7b07-4279-a046-08dac6d6d939",
-  "name": "fq",
-  "role": "fq",
-  "persona": "fq",
-  "allowed_sources": [],
-  "tools": [],
-  "max_retrieval": 5
-}
