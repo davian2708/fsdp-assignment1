@@ -2,7 +2,7 @@ const API_BASE_URL = "http://localhost:8000"; // backend running locally
 const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjE3OTQ1NzU5ODN9.baZmdIL7LBNHU34uAokJ5j-D563yJbWu_VwY8iMjDGM";
 
 export async function createAgent(agentData) {
-  const res = await fetch(`${API_BASE_URL}/agents`, {
+  const res = await fetch(`${API_BASE_URL}/agent`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -20,7 +20,7 @@ export async function createAgent(agentData) {
 }
 
 export async function listAgents() {
-  const res = await fetch(`${API_BASE_URL}/agents`, {
+  const res = await fetch(`${API_BASE_URL}/agent`, {
     headers: { "x-api-key": API_KEY },
   });
 
@@ -29,13 +29,13 @@ export async function listAgents() {
 }
 
 export async function queryAgent(agentId, query) {
-  const res = await fetch(`${API_BASE_URL}/agents/query`, {
+  const res = await fetch(`${API_BASE_URL}/agent/query`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "x-api-key": API_KEY,
     },
-    body: JSON.stringify({ agent_id: agentId, query }),
+    body: JSON.stringify({ agent_id: agentId, user_message: query }),
   });
 
   if (!res.ok) throw new Error("Query failed");
