@@ -7,47 +7,81 @@ import logo from '../assets/Flying Bot Logo.png';
 
 import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { queryAgent } from "../api"; // <-- backend chat call
 
 export default function ChatInterface() {
   const { agentId } = useParams();
   const navigate = useNavigate();
   const handleLogoClick = () => navigate("/");
+
   const [agent, setAgent] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(true);
 
+  // Fetch agent metadata from Firestore
   useEffect(() => {
     async function loadAgent() {
-      const snap = await getDoc(doc(db, "agents", agentId));
-      if (snap.exists()) {
-        const data = snap.data();
-        setAgent(data);
+      try {
+        const snap = await getDoc(doc(db, "agents", agentId));
+        if (snap.exists()) {
+          const data = snap.data();
+          setAgent(data);
 
-        setMessages([
-          {
-            sender: "agent",
-            text: `Hi User xx2f0, I am ${data.name}. How can I help you today?`,
-          },
-        ]);
+          // Initial greeting message from bot
+          setMessages([
+            {
+              sender: "bot",
+              text: `Hi User, I am ${data.name}. How can I help you today?`,
+            },
+          ]);
+        } else {
+          alert("Agent not found in database.");
+        }
+      } catch (err) {
+        console.error("Error fetching agent:", err);
+      } finally {
+        setLoading(false);
       }
     }
+
     loadAgent();
   }, [agentId]);
 
-  const sendMessage = () => {
+  // Send message to backend and get AI response
+  const sendMessage = async () => {
     if (!input.trim()) return;
-    setMessages([...messages, { sender: "user", text: input }]);
+
+    const userMessage = input;
     setInput("");
+
+    // Show user's message in chat
+    setMessages((prev) => [...prev, { sender: "user", text: userMessage }]);
+
+    try {
+      // Send message + agentId to backend
+      const res = await queryAgent(agentId, userMessage);
+
+      // Append AI response
+      setMessages((prev) => [...prev, { sender: "bot", text: res.reply }]);
+    } catch (err) {
+      console.error("Error sending message:", err);
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: "Sorry, something went wrong." },
+      ]);
+    }
   };
 
-  if (!agent) return null;
+  if (loading) return <div>Loading agent...</div>;
+  if (!agent) return <div>Agent not found.</div>;
 
   return (
     <div className="chat-layout">
       <Sidebar />
 
       <div className="chat-panel">
-        {/* === AGENT HEADER CARD === */}
+        {/* === AGENT HEADER === */}
         <div className="agent-header">
           <button className="back-btn" onClick={() => navigate(-1)}>
             <FiArrowLeft size={20} />
@@ -63,7 +97,7 @@ export default function ChatInterface() {
 
             <div className="agent-meta">
               <h2>{agent.name}</h2>
-              <p>Created by User xx2f0</p>
+              <p>Created by User</p>
             </div>
           </div>
 
@@ -77,16 +111,19 @@ export default function ChatInterface() {
           </div>
         </div>
 
-        {/* === BIG WELCOME MESSAGE === */}
-        <div className="welcome-message">
-          <h1>
-            Hi User xx2f0, I am {agent.name}
-            <br />
-            How can I help you today?
-          </h1>
+        {/* === CHAT MESSAGES === */}
+        <div className="messages-container">
+          {messages.map((msg, idx) => (
+            <div
+              key={idx}
+              className={`message ${msg.sender === "user" ? "user" : "bot"}`}
+            >
+              {msg.text}
+            </div>
+          ))}
         </div>
 
-        {/* === INPUT BOX SECTION === */}
+        {/* === INPUT BOX === */}
         <div className="input-area">
           <div className="input-box">
             <FiUpload className="input-icon" size={24} />
