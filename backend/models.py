@@ -12,4 +12,5 @@ class AgentCreateRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     agent_id: str
-    user_message: str
+    user_message: Optional[str] = None
+    image_base64: Optional[str] = None

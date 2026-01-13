@@ -44,6 +44,11 @@ def build_system_prompt(agent: dict) -> str:
         "Use at most one emoji, and only when it feels natural.\n"
         "Always end with exactly one gentle follow-up question.\n"
         "The follow-up question must always be placed on its own line, separated by a blank line from the main response.\n"
+
+        "If an image is provided:\n"
+        "- You must look at the image carefully.\n"
+        "- Identify the drink or ingredients shown.\n"
+        "- Describe what you see before giving advice.\n\n"
     )
 
 @router.options("/query")
@@ -53,19 +58,48 @@ async def chat_options():
 def get_agent_sync(agent_id: str):
     return db.get_agent_by_id(agent_id)
 
-def call_openai_sync(messages):
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=messages,
-        temperature=0.7,
-        max_tokens=250,
+def call_openai_sync(system_prompt, user_text, image_base64=None):
+    content = []
+
+    if user_text:
+        content.append({
+            "type": "input_text",
+            "text": user_text
+        })
+
+    if image_base64:
+        content.append({
+            "type": "input_image",
+            "image_url": image_base64
+        })
+
+    response = client.responses.create(
+        model="gpt-4.1",
+        input=[
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": system_prompt
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "content": content
+            }
+        ],
+        max_output_tokens=300,
     )
-    return response.choices[0].message.content
+
+    return response.output_text
 
 @router.post("/query")
 async def chat(req: ChatRequest):
     print("Chat endpoint hit")
     print("Incoming request:", req.agent_id, req.user_message)
+    print("IMAGE RECEIVED:", bool(req.image_base64))
 
     try:
         agent = await asyncio.to_thread(get_agent_sync, req.agent_id)
@@ -78,15 +112,15 @@ async def chat(req: ChatRequest):
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
-    messages = [
-        {"role": "system", "content": build_system_prompt(agent)},
-        {"role": "user", "content": req.user_message},
-    ]
-
     try:
         reply = await asyncio.wait_for(
-            asyncio.to_thread(call_openai_sync, messages),
-            timeout=8
+            asyncio.to_thread(
+                call_openai_sync,
+                build_system_prompt(agent),
+                req.user_message,
+                req.image_base64
+            ),
+            timeout=25
         )
         print("OpenAI replied")
         return {"reply": reply}
@@ -95,6 +129,5 @@ async def chat(req: ChatRequest):
         return {"reply": "AI response timed out. Please try again."}
 
     except Exception as e:
-        print("OpenAI error:", e)
-        return {"reply": "AI service error."}
-
+        print("OPENAI ERROR:", e)
+        raise HTTPException(status_code=500, detail="AI service error")

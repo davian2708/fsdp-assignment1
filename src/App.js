@@ -16,6 +16,7 @@ function App() {
         <Route path="/create-agent" element={<CreateAgentPage />} />
         <Route path="/agent-chat/:agentId" element={<ChatInterface />} />
         <Route path="/view-agents" element={<ViewAgents />} />
+        <Route path="/agents" element={<ViewAgents />} />
 
         <Route path="/test" element={<UserForm />} />
       </Routes>

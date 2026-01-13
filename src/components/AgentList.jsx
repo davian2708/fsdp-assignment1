@@ -1,39 +1,80 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/homepage.css";
+
+// Firebase
+import { db } from "../firebase";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+} from "firebase/firestore";
 
 export default function AgentList() {
   const [agents, setAgents] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    //fetch("http://127.0.0.1:8000/api/agents")
-      //.then((res) => res.json())
-      //.then((data) => setAgents(data))
-      //.catch((err) => console.error("Error fetching agents:", err));
+    const fetchRecentAgents = async () => {
+      const q = query(
+        collection(db, "agents"),
+        orderBy("lastUsedAt", "desc"),
+        limit(5)
+      );
+
+      const snap = await getDocs(q);
+      const data = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setAgents(data);
+    };
+
+    fetchRecentAgents();
   }, []);
 
   return (
     <div className="agent-list">
-      <h2>Recent AI Agents</h2>
+      <h3 className="section-title">Recent AI Agents</h3>
 
       {agents.length === 0 ? (
-        <p style={{ color: "#6b7280" }}>No agents found.</p>
+        <p className="empty-text">No agents found.</p>
       ) : (
-        <ul style={{ listStyle: "none", padding: 0, marginTop: "10px" }}>
-          {agents.map((agent) => (
-            <li key={agent.id} className="agent-item">
-              <span>{agent.name}</span>
-              <span
-                className={
-                  agent.status === "Active"
-                    ? "agent-status active"
-                    : "agent-status idle"
-                }
+        agents.map((agent) => (
+          <div
+            key={agent.id}
+            className="agent-row"
+            onClick={() => navigate(`/agent-chat/${agent.id}`)}
+          >
+            <div className="agent-left">
+              <div
+                className="agent-avatar"
+                style={{ backgroundColor: agent.color }}
               >
-                {agent.status}
-              </span>
-            </li>
-          ))}
-        </ul>
+                {agent.icon || "🤖"}
+              </div>
+
+              <div className="agent-info">
+                <div className="agent-name">{agent.name}</div>
+                <div className="agent-last-used">
+                  Last used{" "}
+                  {agent.lastUsedAt
+                    ? agent.lastUsedAt.toDate().toLocaleDateString()
+                    : "—"}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))
+      )}
+
+      {agents.length > 0 && (
+        <div className="more" onClick={() => navigate("/agents")}>
+          View all agents
+        </div>
       )}
     </div>
   );

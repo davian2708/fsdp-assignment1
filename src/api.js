@@ -1,5 +1,6 @@
-export async function queryAgent(agentId, userMessage) {
+export async function queryAgent(agentId, userMessage, imageBase64 = null) {
   console.log("queryAgent called:", agentId, userMessage);
+  console.log("Sending image:", !!imageBase64);
 
   const res = await fetch("http://127.0.0.1:8000/agent/query", {
     method: "POST",
@@ -9,6 +10,7 @@ export async function queryAgent(agentId, userMessage) {
     body: JSON.stringify({
       agent_id: agentId,
       user_message: userMessage,
+      image_base64: imageBase64,
     }),
   });
 

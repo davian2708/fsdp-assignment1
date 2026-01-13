@@ -1,14 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/SideBar";
 import "../styles/chatinterface.css";
-import { FiArrowLeft, FiEdit2, FiSend, FiUpload, FiMic } from "react-icons/fi";
+import {
+  FiArrowLeft,
+  FiEdit2,
+  FiSend,
+  FiUpload,
+  FiMic,
+  FiThumbsUp,
+  FiThumbsDown
+} from "react-icons/fi";
 import { useParams, useNavigate } from "react-router-dom";
 import logo from '../assets/Flying Bot Logo.png';
 import ReactMarkdown from "react-markdown";
 
 
 import { db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { 
+  doc, 
+  getDoc, 
+  updateDoc, 
+  serverTimestamp, 
+  collection, 
+  addDoc,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { queryAgent } from "../api"; // <-- backend chat call
 
 export default function ChatInterface() {
@@ -21,6 +39,9 @@ export default function ChatInterface() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+
   const normalizeMessage = (text) => {
   const bulletCount = (text.match(/^[-*•]\s/gm) || []).length;
 
@@ -31,8 +52,25 @@ export default function ChatInterface() {
   return text;
 };
 
+const getFileIcon = (mimeType) => {
+  if (mimeType.includes("pdf")) return "📄";
+  if (mimeType.includes("word")) return "📝";
+  if (mimeType.includes("zip")) return "🗜";
+  if (mimeType.includes("excel")) return "📊";
+  return "📎";
+};
 
   const messagesEndRef = useRef(null);
+
+      const getSessionId = () => {
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+      sessionId = "session_" + Date.now();
+      localStorage.setItem("sessionId", sessionId);
+    }
+    return sessionId;
+  };
+  const sessionId = getSessionId();
 
     useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -46,6 +84,10 @@ export default function ChatInterface() {
         if (snap.exists()) {
           const data = snap.data();
           setAgent(data);
+
+          await updateDoc(doc(db, "agents", agentId), {
+            lastUsedAt: serverTimestamp(),
+          });
 
           // Initial greeting message from bot
           setMessages([
@@ -67,22 +109,71 @@ export default function ChatInterface() {
     loadAgent();
   }, [agentId]);
 
+  const fileToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  const prepareFileForFirestore = async (file) => {
+  if (file.size > 1024 * 1024) {
+    alert("File too large (max 1MB)");
+    return null;
+  }
+  const base64 = await fileToBase64(file);
+  return {
+    name: file.name,
+    type: file.type,
+    size: file.size,
+    base64,
+    previewType: file.type.startsWith("image/")
+      ? "image"
+      : "file",
+  };
+};
+
   // Send message to backend and get AI response
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() && !selectedFile) return;
 
     const userMessage = input;
     setInput("");
+      let fileData = null;
 
+    if (selectedFile) {
+      fileData = await prepareFileForFirestore(selectedFile);
+      setSelectedFile(null);
+      setFilePreview(null);
+    }
     // Show user's message in chat
-    setMessages((prev) => [...prev, { sender: "user", text: userMessage }]);
+    setMessages((prev) => [...prev, { sender: "user", text: userMessage, file: fileData}]);
+
+    //  AUTO-SAVE USER QUESTION
+  await addDoc(collection(db, "messages"), {
+    agentId,
+    sender: "user",
+    sessionId,
+    text: userMessage,
+    file: fileData,
+    createdAt: serverTimestamp(),
+  });
 
     try {
       // Send message + agentId to backend
-      const res = await queryAgent(agentId, userMessage);
+      const res = await queryAgent(agentId, userMessage, fileData?.base64 ? fileData.base64 : null);
+
+      const aiDocRef = await addDoc(collection(db, "messages"), {
+        agentId,
+        sender: "ai",
+        sessionId,
+        text: res.reply,
+        createdAt: serverTimestamp(),
+      });
 
       // Append AI response
-      setMessages((prev) => [...prev, { sender: "bot", text: res.reply }]);
+      setMessages((prev) => [...prev, {id:aiDocRef.id, sender: "bot", text: res.reply }]);
     } catch (err) {
       console.error("Error sending message:", err);
       setMessages((prev) => [
@@ -90,6 +181,25 @@ export default function ChatInterface() {
         { sender: "bot", text: "Sorry, something went wrong." },
       ]);
     }
+  };
+
+    const submitFeedback = async (messageId, satisfied) => {
+    await addDoc(collection(db, "feedback"), {
+      messageId,
+      agentId,
+      sessionId,
+      satisfied,
+      createdAt: serverTimestamp(),
+    });
+  };
+
+  const hasFeedback = async (messageId) => {
+    const q = query(
+      collection(db, "feedback"),
+      where("messageId", "==", messageId)
+    );
+    const snap = await getDocs(q);
+    return !snap.empty;
   };
 
   if (loading) return <div>Loading agent...</div>;
@@ -131,25 +241,80 @@ export default function ChatInterface() {
         </div>
 
         {/* === CHAT MESSAGES === */}
-        <div className="messages-container">
+                <div className="messages-container">
           {messages.map((msg, idx) => (
-            <div
+            <MessageBubble
               key={idx}
-              className={`message ${msg.sender === "user" ? "user" : "bot"}`}
-            >
-              <ReactMarkdown>
-                {normalizeMessage(msg.text)}
-              </ReactMarkdown>
-            </div>
+              msg={msg}
+              submitFeedback={submitFeedback}
+              hasFeedback={hasFeedback}
+            />
           ))}
           <div ref={messagesEndRef} />
         </div>
 
         {/* === INPUT BOX === */}
         <div className="input-area">
-          <div className="input-box">
-            <FiUpload className="input-icon" size={24} />
 
+        {selectedFile && (
+          <div className="file-preview-card">
+            {filePreview?.type === "image" ? (
+              <img src={filePreview.url} alt="preview" />
+            ) : (
+              <div className="file-card">
+                <div className="file-icon">
+                  {getFileIcon(selectedFile.type)}
+                </div>
+
+                <div className="file-meta">
+                  <div className="file-name">{selectedFile.name}</div>
+                  <div className="file-size">
+                    {(selectedFile.size / 1024).toFixed(1)} KB
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button
+              className="remove-file"
+              onClick={() => {
+                setSelectedFile(null);
+                setFilePreview(null);
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+          <div className="input-box">
+            {/* 📎 File upload */}
+            <label className="input-icon upload-icon">
+              <FiUpload size={20} />
+              <input
+                type="file"
+                hidden
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  if (!file) return;
+
+                  setSelectedFile(file);
+
+                  if (file.type.startsWith("image/")) {
+                    setFilePreview({
+                      type: "image",
+                      url: URL.createObjectURL(file),
+                    });
+                  } else {
+                    setFilePreview({
+                      type: "file",
+                    });
+                  }
+                }}
+              />
+            </label>
+
+            {/* Text input */}
             <input
               type="text"
               placeholder="Type your message..."
@@ -158,13 +323,88 @@ export default function ChatInterface() {
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             />
 
-            <FiMic className="input-icon" size={24} />
+            {/* Send button */}
             <button className="send-btn" onClick={sendMessage}>
-              <FiSend size={20} />
+              <FiSend size={18} />
             </button>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function MessageBubble({ msg, submitFeedback, hasFeedback }) {
+  const [rated, setRated] = useState(false);
+
+  useEffect(() => {
+    if (msg.id) {
+      hasFeedback(msg.id).then(setRated);
+    }
+  }, [msg.id]);
+
+  return (
+    <div className={`message ${msg.sender === "user" ? "user" : "bot"}`}>
+      {/*TEXT MESSAGE*/}
+      {msg.text && (
+        <ReactMarkdown>
+          {msg.text}
+        </ReactMarkdown>
+      )}
+
+      {/*FILE MESSAGE*/}
+      {msg.file && (
+        <div className="file-card">
+          {msg.file.previewType === "image" ? (
+            <img
+              src={msg.file.base64}
+              alt={msg.file.name}
+              className="file-image"
+            />
+          ) : (
+            <>
+              <div className="file-icon">📎</div>
+              <div className="file-meta">
+                <div className="file-name">{msg.file.name}</div>
+                <div className="file-size">
+                  {(msg.file.size / 1024).toFixed(1)} KB
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/*FEEDBACK (AI ONLY)*/}
+      {msg.sender === "bot" && msg.id && !rated && (
+        <div className="feedback">
+          <button
+            className="feedback-btn"
+            title="Helpful"
+            onClick={() => {
+              submitFeedback(msg.id, true);
+              setRated(true);
+            }}
+          >
+            <FiThumbsUp />
+          </button>
+
+          <button
+            className="feedback-btn"
+            title="Not helpful"
+            onClick={() => {
+              submitFeedback(msg.id, false);
+              setRated(true);
+            }}
+          >
+            <FiThumbsDown />
+          </button>
+        </div>
+      )}
+
+      {rated && msg.sender === "bot" && (
+        <small className="feedback-done">Thanks for your feedback!</small>
+      )}
     </div>
   );
 }

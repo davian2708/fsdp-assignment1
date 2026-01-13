@@ -208,6 +208,154 @@
   margin: 6px 0;
 }
 
+/*MESSAGE FEEDBACK*/
+.feedback {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.feedback-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  color: var(--text-muted);
+  font-size: 18px;
+
+  padding: 4px;
+  border-radius: 6px;
+
+  transition: 
+    color 0.2s ease,
+    transform 0.15s ease,
+    background 0.2s ease;
+}
+
+.feedback-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  transform: scale(1.1);
+}
+
+.feedback-btn:first-child:hover {
+  color: #22c55e;
+}
+
+.feedback-btn:last-child:hover {
+  color: #ef4444;
+}
+
+.feedback-done {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/*File Upload*/
+.file-preview-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+/* Image preview */
+.file-preview-card img {
+  width: 120px;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 6px 18px var(--shadow-color);
+}
+
+.file-image {
+  max-width: 260px;
+  max-height: 260px;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 6px 18px var(--shadow-color);
+  display: block;
+}
+
+/* Non-image file card */
+.file-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  min-width: 220px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px var(--shadow-color);
+}
+
+.file-icon {
+  font-size: 26px;
+}
+
+.file-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Remove file (X button) */
+.remove-file {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+
+  width: 22px;
+  height: 22px;
+
+  background: #ef4444;
+  border: none;
+  border-radius: 50%;
+  color: white;
+
+  font-size: 12px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.remove-file:hover {
+  background: #dc2626;
+}
+
+.message.user .file-image {
+  max-width: 280px;
+}
+
+.message.bot .file-image {
+  max-width: 240px;
+}
 
 /*RESPONSIVE ADJUSTMENTS – CHAT INTERFACE*/
 
@@ -282,5 +430,3 @@
     max-width: 960px;
   }
 }
-
-
