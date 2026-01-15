@@ -1,0 +1,125 @@
+.response-saver {
+  position: relative;
+}
+
+.save-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #2196f3;
+}
+
+.save-menu {
+  position: absolute;
+  bottom: 120%;
+  left: -40px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 240px;
+  margin-bottom: 8px;
+  z-index: 1000;
+}
+
+.save-menu h4 {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+.tag-input-area {
+  margin-bottom: 8px;
+}
+
+.tag-input-area input {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.tags-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+  min-height: 20px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-size: 11px;
+}
+
+.tag button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.tag button:hover {
+  opacity: 0.7;
+}
+
+.save-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.save-actions button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+.save-confirm {
+  background-color: #2196f3;
+  color: white;
+}
+
+.save-confirm:hover:not(:disabled) {
+  background-color: #1976d2;
+}
+
+.save-cancel {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.save-cancel:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.save-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

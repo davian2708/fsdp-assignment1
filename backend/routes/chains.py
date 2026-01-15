@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from backend.models import AgentChainRequest
-from backend import db
+from models import AgentChainRequest
+import db
 import openai
 import os
 from dotenv import load_dotenv

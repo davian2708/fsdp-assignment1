@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File
-from backend.models import KnowledgeBaseUploadRequest, FaqBuilderRequest
-from backend import db
+from models import KnowledgeBaseUploadRequest, FaqBuilderRequest
+import db
 import PyPDF2
 from io import BytesIO
 
@@ -61,18 +61,15 @@ async def upload_pdf(agent_id: str, file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/upload-text")
-async def upload_text(agent_id: str, content: str, file_name: str = ""):
+async def upload_text(req: KnowledgeBaseUploadRequest):
     """
     Upload raw text to knowledge base.
     """
     try:
         doc_id = db.save_kb_document(
-            agent_id=agent_id,
-            content=content,
-            metadata={
-                "source_type": "text",
-                "file_name": file_name,
-            }
+            agent_id=req.agent_id,
+            content=req.content,
+            metadata=req.metadata.dict()
         )
         return {
             "status": "success",
@@ -83,7 +80,7 @@ async def upload_text(agent_id: str, content: str, file_name: str = ""):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/upload-url")
-async def upload_from_url(agent_id: str, url: str):
+async def upload_from_url(req: KnowledgeBaseUploadRequest):
     """
     Ingest content from a URL (e.g., FAQ website, article).
     Requires requests library and HTML parsing.
@@ -92,17 +89,15 @@ async def upload_from_url(agent_id: str, url: str):
         import requests
         from bs4 import BeautifulSoup
         
+        url = req.metadata.source_url or ""
         response = requests.get(url)
         soup = BeautifulSoup(response.content, 'html.parser')
         text = soup.get_text()
         
         doc_id = db.save_kb_document(
-            agent_id=agent_id,
+            agent_id=req.agent_id,
             content=text,
-            metadata={
-                "source_type": "url",
-                "source_url": url,
-            }
+            metadata=req.metadata.dict()
         )
         return {
             "status": "success",

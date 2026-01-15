@@ -1,7 +1,7 @@
 # backend/db.py
 from typing import Optional, List, Dict
 from datetime import datetime
-from .firebase_admin_init import db  # use relative import if this is inside backend/
+from firebase_admin_init import db
 
 COLLECTION_AGENTS = "agents"
 COLLECTION_FEEDBACK = "feedback"
@@ -159,9 +159,13 @@ def get_agent_chains(agent_id: str) -> List[Dict]:
     """
     Get all agents linked to this agent (primary or secondary).
     """
-    primary_docs = db.collection(COLLECTION_AGENT_CHAINS).where("primary_agent_id", "==", agent_id).stream()
-    secondary_docs = db.collection(COLLECTION_AGENT_CHAINS).where("secondary_agent_id", "==", agent_id).stream()
-    return [d.to_dict() for d in list(primary_docs) + list(secondary_docs)]
+    try:
+        primary_docs = list(db.collection(COLLECTION_AGENT_CHAINS).where("primary_agent_id", "==", agent_id).stream())
+        secondary_docs = list(db.collection(COLLECTION_AGENT_CHAINS).where("secondary_agent_id", "==", agent_id).stream())
+        all_chains = [d.to_dict() for d in primary_docs + secondary_docs]
+        return all_chains
+    except Exception as e:
+        return []
 
 def save_chain_conversation(primary_agent_id: str, secondary_agent_id: str, user_message: str, primary_response: str, secondary_response: str):
     """

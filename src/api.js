@@ -127,7 +127,10 @@ export async function uploadText(agentId, content, fileName = "") {
     body: JSON.stringify({
       agent_id: agentId,
       content: content,
-      file_name: fileName,
+      metadata: {
+        source_type: "text",
+        file_name: fileName,
+      },
     }),
   });
 
@@ -144,7 +147,11 @@ export async function uploadFromURL(agentId, url) {
     },
     body: JSON.stringify({
       agent_id: agentId,
-      url: url,
+      content: "",
+      metadata: {
+        source_type: "url",
+        source_url: url,
+      },
     }),
   });
 

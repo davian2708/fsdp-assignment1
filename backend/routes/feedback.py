@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from backend.models import FeedbackRequest
-from backend import db
+from models import FeedbackRequest
+import db
 
 router = APIRouter()
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from backend.models import SaveResponseRequest
-from backend import db
+from models import SaveResponseRequest
+import db
 
 router = APIRouter()
 

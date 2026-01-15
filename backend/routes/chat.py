@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel  # <- add this
-from backend import db
+import db
 import os
 import openai
-from ..models import ChatRequest
+from models import ChatRequest
 from dotenv import load_dotenv
 
 load_dotenv()

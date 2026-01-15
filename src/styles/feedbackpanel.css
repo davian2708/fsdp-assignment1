@@ -1,0 +1,126 @@
+.feedback-panel {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  position: relative;
+}
+
+.feedback-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feedback-btn:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
+.feedback-btn.thumbs-up:hover:not(:disabled) {
+  color: #4caf50;
+}
+
+.feedback-btn.thumbs-down:hover:not(:disabled) {
+  color: #f44336;
+}
+
+.feedback-btn.flag:hover:not(:disabled) {
+  color: #ff9800;
+}
+
+.feedback-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.feedback-btn.submitted {
+  background-color: rgba(0, 0, 0, 0.08);
+  font-weight: 600;
+}
+
+.feedback-btn.thumbs-up.submitted {
+  color: #4caf50 !important;
+  background-color: rgba(76, 175, 80, 0.15);
+}
+
+.feedback-btn.thumbs-down.submitted {
+  color: #f44336 !important;
+  background-color: rgba(244, 67, 54, 0.15);
+}
+
+.feedback-btn.flag.submitted {
+  color: #ff9800 !important;
+  background-color: rgba(255, 152, 0, 0.15);
+}
+
+.comment-box {
+  position: absolute;
+  bottom: 120%;
+  left: -10px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  margin-bottom: 8px;
+  z-index: 1000;
+}
+
+.comment-box textarea {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 11px;
+  resize: vertical;
+  min-height: 60px;
+  margin-bottom: 8px;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.comment-actions button {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+.comment-actions button:first-child {
+  background-color: #4caf50;
+  color: white;
+}
+
+.comment-actions button:first-child:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.comment-actions button:last-child {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.comment-actions button:last-child:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.comment-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

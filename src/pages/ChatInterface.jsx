@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/SideBar";
+import FeedbackPanel from "../components/FeedbackPanel";
+import ResponseSaver from "../components/ResponseSaver";
+import KnowledgeBase from "../components/KnowledgeBase";
+import AgentChaining from "../components/AgentChaining";
 import "../styles/chatinterface.css";
 import { FiArrowLeft, FiEdit2, FiSend, FiUpload, FiMic } from "react-icons/fi";
 import { useParams, useNavigate } from "react-router-dom";
@@ -18,6 +22,7 @@ export default function ChatInterface() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
+  const [showKB, setShowKB] = useState(false);
 
   // Fetch agent metadata from Firestore
   useEffect(() => {
@@ -102,14 +107,29 @@ export default function ChatInterface() {
           </div>
 
           <div className="agent-header-actions">
-            <button className="edit-btn">
+            <button 
+              className="edit-btn"
+              onClick={() => alert("Edit feature coming soon!")}
+              title="Edit agent"
+            >
               <FiEdit2 size={18} /> Edit
             </button>
+            <button
+              className="kb-btn"
+              onClick={() => setShowKB(!showKB)}
+              title="Manage Knowledge Base"
+            >
+              📚 KB
+            </button>
+            <AgentChaining primaryAgentId={agentId} />
             <button className="chat-btn">
               <FiSend size={18} /> Chat
             </button>
           </div>
         </div>
+
+        {/* === KNOWLEDGE BASE PANEL === */}
+        {showKB && <KnowledgeBase agentId={agentId} />}
 
         {/* === CHAT MESSAGES === */}
         <div className="messages-container">
@@ -118,7 +138,25 @@ export default function ChatInterface() {
               key={idx}
               className={`message ${msg.sender === "user" ? "user" : "bot"}`}
             >
-              {msg.text}
+              <div className="message-content">
+                <p>{msg.text}</p>
+                {msg.sender === "bot" && (
+                  <div className="message-actions">
+                    <FeedbackPanel
+                      messageId={`msg_${idx}`}
+                      agentId={agentId}
+                      onFeedbackSubmitted={() =>
+                        console.log("Feedback submitted")
+                      }
+                    />
+                    <ResponseSaver
+                      agentId={agentId}
+                      userMessage={messages[idx - 1]?.text || ""}
+                      botResponse={msg.text}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>
