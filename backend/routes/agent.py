@@ -23,9 +23,11 @@ async def create_agent(req: AgentCreateRequest):
     db.create_agent_doc(doc)
     return doc
 
+
 @router.get("/")
 async def get_agents():
     return db.list_agents()
+
 
 @router.get("/{agent_id}")
 async def get_agent(agent_id: str):
@@ -33,6 +35,7 @@ async def get_agent(agent_id: str):
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
     return agent
+
 
 @router.post("/from_persona", status_code=201)
 async def create_agent_from_persona(payload: dict):

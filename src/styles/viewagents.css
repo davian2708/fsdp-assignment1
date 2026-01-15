@@ -4,12 +4,15 @@
   width: 100%;
   background: var(--bg-primary); 
   color: var(--text-primary);    
+  overflow-x: hidden;
 }
 
 .view-panel {
   flex: 1;
   padding: 40px 60px;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* --- LOGO --- */
@@ -31,6 +34,10 @@
   width: auto; 
   display: block; 
   margin: 0 auto; 
+}
+
+body.light-mode .logo {
+  filter: invert(1) brightness(0.25);
 }
 
 .view-title {
@@ -130,4 +137,122 @@
   margin-left: auto;
   color: var(--text-secondary);         
   cursor: pointer;
+}
+
+/* Mobile & small tablets */
+@media (max-width: 768px) {
+
+  .view-panel {
+    padding: 20px 16px;
+  }
+
+  /* Logo */
+  .view-logo-img {
+    height: 26px;
+  }
+
+  .view-title {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  /* Search bar */
+  .view-search {
+    width: 95%;
+    padding: 10px 14px;
+    font-size: 14px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+
+  /* Filters */
+  .view-filters {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .filter-btn {
+    padding: 8px 14px;
+    font-size: 13px;
+    border-radius: 16px;
+    white-space: nowrap;
+  }
+
+  .filter-btn.active {
+    font-weight: 600;
+  }
+
+  /* Grid → single column */
+  .agents-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  /* Cards */
+  .agent-card {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .agent-image-box {
+    width: 64px;
+    height: 64px;
+  }
+
+  .agent-img {
+    font-size: 30px;
+  }
+
+  .agent-info h3 {
+    font-size: 15px;
+  }
+
+  .agent-info p {
+    font-size: 13px;
+  }
+}
+
+/* Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .view-panel {
+    padding: 20px 16px;
+    overflow-x: hidden;
+  }
+
+  .view-search {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .agents-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .agent-image-box {
+    width: 80px;
+    height: 80px;
+  }
+
+  .agent-img {
+    font-size: 36px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1440px) {
+  .view-panel {
+    padding: 48px 80px;
+  }
+
+  .view-search {
+    width: 50%;
+  }
+
+  .agents-grid {
+    gap: 32px;
+  }
 }

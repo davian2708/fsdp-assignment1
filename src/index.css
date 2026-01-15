@@ -1,51 +1,58 @@
-/* === GLOBAL APP STYLES (Theme Variables) === */
+/* ===========================
+   GLOBAL THEME TOKENS*/
+
+/* --- DARK MODE (DEFAULT) --- */
 :root {
-  /* --- DARK THEME (Default) --- */
-  --bg-primary: #1e1e1e;
-  --bg-secondary: #252525;
-  --bg-input: #333333;
-  
-  --text-primary: #e0e0e0;
-  --text-secondary: #c0c0c0;
-  --text-inverted: #111;
-  
-  --border-color: #3a3a3a;
-  --action-btn: #007bff;
-  --shadow-color: rgba(0, 0, 0, 0.15);
+  --bg-primary: #18181b;        
+  --bg-secondary: #1f1f23;     
+  --bg-input: #2a2a2e;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-inverted: #09090b;
+  --border-color: #2f2f36;
+  --shadow-color: rgba(0, 0, 0, 0.35);
+  --action-btn: #3b82f6; 
+  --btn-bg: rgba(255, 255, 255, 0.06);
+  --btn-bg-hover: rgba(255, 255, 255, 0.12);
+  --btn-border: rgba(255, 255, 255, 0.14);
 }
 
-/* --- LIGHT MODE OVERRIDE --- */
+/* --- LIGHT MODE --- */
 body.light-mode {
-  --bg-primary: #f7f7f7;
-  --bg-secondary: #ffffff;
-  --bg-input: #eeeeee;
-  
-  --text-primary: #333333;
-  --text-secondary: #555555;
-  --text-inverted: #e0e0e0;
-  
-  --border-color: #e0e0e0;
-  --shadow-color: rgba(0, 0, 0, 0.08);
+  --bg-primary: #ffffff;        
+  --bg-secondary: #ededed;      
+  --bg-input: #d9d9d9;
+  --text-primary: #18181b;
+  --text-secondary: #52525b;
+  --text-muted: #71717a;
+  --border-color: #e4e6eb;
+  --shadow-color: rgba(0, 0, 0, 0.06);
+  --action-btn: #2563eb;
+  --btn-bg: #f1f2f4;
+  --btn-bg-hover: #e6e8ec;
+  --btn-border: #d6d9de;
 }
 
+/* BASE */
 
-/* === HTML & BODY (Apply Variables) === */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
-  font-family: "Inter", sans-serif;
-  
-  /* Apply variables for consistent look */
-  background: var(--bg-primary); 
-  color: var(--text-primary); 
-  
+
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+
+  background: var(--bg-primary);
+  color: var(--text-primary);
+
   overflow-x: hidden;
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-/* === ROOT CONTAINER === */
 #root {
   height: 100%;
   width: 100%;
@@ -53,28 +60,79 @@ html, body {
   flex-direction: column;
 }
 
-/* === RESET COMMON ELEMENTS === */
+/* RESET */
+
 button {
   font-family: inherit;
+  color: inherit;
+  background: none;
 }
 
 input {
   font-family: inherit;
+  color: inherit;
 }
 
-/* ADDED: Global focus style for accessibility */
-*:focus {
-    outline: 2px solid var(--action-btn);
-    outline-offset: 2px;
+/*ACCESSIBILITY*/
+
+*:focus-visible {
+  outline: 2px solid var(--action-btn);
+  outline-offset: 2px;
 }
 
-/* === UTILITY CLASSES === */
+/*UTILITIES*/
+
 .center {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
-.logo {
-  filter: brightness(0) saturate(100%) invert(53%) sepia(14%) saturate(2690%) hue-rotate(175deg) brightness(102%) contrast(88%);
+/*GLOBAL RESPONSIVE MEDIA QUERIES*/
+
+/* Small screens (phones) */
+@media (max-width: 640px) {
+  html,
+  body {
+    font-size: 14px;
+  }
+
+  button {
+    min-height: 40px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  html,
+  body {
+    font-size: 15px;
+  }
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1440px) {
+  html,
+  body {
+    font-size: 16px;
+  }
+}
+
+/* Touch devices */
+@media (hover: none) and (pointer: coarse) {
+  button {
+    min-height: 44px;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
 }

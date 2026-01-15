@@ -1,31 +1,56 @@
+/*AGENT OPTIONS MENU*/
+
 .agent-options-menu {
   position: absolute;
-  right: 10px;
-  top: 40px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  width: 140px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  top: 44px;
+  right: 0;
+
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+
+  width: 160px;
   padding: 6px 0;
+
+  box-shadow: 0 12px 30px var(--shadow-color);
   z-index: 50;
 }
 
+/* Menu buttons */
 .agent-options-menu button {
   display: block;
   width: 100%;
-  padding: 10px 12px;
-  background: white;
+
+  padding: 10px 14px;
+  background: transparent;
   border: none;
+
   text-align: left;
   cursor: pointer;
   font-size: 14px;
+  color: var(--text-primary);
+
+  transition: background 0.15s ease;
 }
 
 .agent-options-menu button:hover {
-  background: #f2f2f2;
+  background: var(--bg-input);
 }
 
+/* Destructive action */
 .agent-options-menu .danger {
-  color: red;
+  color: #dc2626; 
+}
+
+/* Small screens */
+@media (max-width: 640px) {
+  .agent-options-menu {
+    right: 0;
+    width: 180px;
+  }
+
+  .agent-options-menu button {
+    padding: 12px 14px;
+    font-size: 15px;
+  }
 }

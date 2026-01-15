@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:8000"; // backend running locally
+const API_BASE_URL = "http://localhost:8000";
 const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjE3OTQ1NzU5ODN9.baZmdIL7LBNHU34uAokJ5j-D563yJbWu_VwY8iMjDGM";
 
 // ===== AGENT ENDPOINTS =====
@@ -30,7 +30,6 @@ export async function listAgents() {
 }
 
 export async function queryAgent(agentId, query) {
-  // Fixed endpoint: was /agents/query, now /chat
   const res = await fetch(`${API_BASE_URL}/chat`, {
     method: "POST",
     headers: {
@@ -56,7 +55,7 @@ export async function submitFeedback(chatId, messageId, agentId, feedbackType, u
       chat_id: chatId,
       message_id: messageId,
       agent_id: agentId,
-      feedback_type: feedbackType, // "thumbs_up", "thumbs_down", "flag_incorrect"
+      feedback_type: feedbackType,
       user_comment: userComment,
     }),
   });

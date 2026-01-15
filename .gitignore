@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/build
 /.pnp
 .pnp.js
 
@@ -13,6 +14,7 @@
 
 # misc
 .DS_Store
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -24,3 +26,15 @@ yarn-error.log*
 
 # Logs
 *.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+
+# Firebase secrets
+firebase/serviceaccount.json
+serviceaccount.json

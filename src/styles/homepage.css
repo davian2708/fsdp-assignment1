@@ -150,29 +150,92 @@
 
 /* === AGENT LIST === */
 .agent-list {
-  background: var(--bg-secondary); 
+  background: var(--bg-secondary);
   border-radius: 12px;
-  border: 1px solid var(--border-color); 
-  padding: 10px;
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  margin-top: 24px;
 }
 
+/* Title */
+.section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+/* Empty state */
+.empty-text {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* Agent row */
 .agent-row {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border-color); 
-  padding: 8px 0;
+  padding: 10px 0;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
+.agent-row:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.agent-row:not(:last-child) {
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Left section */
+.agent-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Avatar */
+.agent-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* Info */
+.agent-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.agent-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.agent-last-used {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* View more */
 .more {
   text-align: center;
   color: var(--text-secondary);
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 12px;
+  font-size: 14px;
   transition: 0.2s ease;
 }
 
 .more:hover {
-  color: var(--text-primary); 
+  color: var(--text-primary);
 }
 
 /* === SETTINGS ICON BUTTON === */
@@ -206,4 +269,124 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-secondary);
+}
+
+/*RESPONSIVE ADJUSTMENTS – HOMEPAGE*/
+/* Small screens (phones) */
+@media (max-width: 640px) {
+  .homepage {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .main {
+    padding: 16px 12px;
+    height: auto;
+  }
+
+  /* Header */
+  .dashboard-header {
+    height: auto;
+    margin-bottom: 24px;
+    justify-content: flex-start;
+  }
+
+  .dashboard-header h1 {
+    font-size: 24px;
+  }
+
+  .logo {
+    width: 200px;
+  }
+
+  .settings-btn {
+    right: 12px;
+    top: 12px;
+    padding: 8px;
+  }
+
+  .settings-icon {
+    font-size: 22px;
+  }
+
+  /* Stats cards stack */
+  .stats-grid {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    min-width: 100%;
+    padding: 16px 0;
+  }
+
+  .card p {
+    font-size: 22px;
+  }
+
+  /* Content cards */
+  .usage-card,
+  .agent-section {
+    padding: 20px;
+  }
+
+  .usage-card h3,
+  .agent-section h3 {
+    font-size: 16px;
+    padding-left: 0;
+  }
+
+  /* Agent list */
+  .agent-row {
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 0;
+  }
+}
+
+/* Medium screens (tablets / iPad) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .main {
+    padding: 24px 24px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 30px;
+  }
+
+  .logo {
+    width: 240px;
+  }
+
+  .stats-grid {
+    gap: 20px;
+  }
+
+  .card p {
+    font-size: 24px;
+  }
+
+  .usage-card,
+  .agent-section {
+    padding: 24px;
+  }
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1440px) {
+  .main {
+    padding: 40px 80px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 38px;
+  }
+
+  .logo {
+    width: 320px;
+  }
+
+  .stats-grid {
+    gap: 32px;
+  }
 }

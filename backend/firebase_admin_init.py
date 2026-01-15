@@ -1,19 +1,13 @@
-from pathlib import Path
+import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Resolve project root (one directory above backend/)
-ROOT_DIR = Path(__file__).resolve().parent.parent
-
-# Path to firebase/serviceaccount.json
-cred_path = ROOT_DIR / "firebase" / "serviceaccount.json"
-
-if not cred_path.exists():
-    raise FileNotFoundError(f"Firebase credentials not found at {cred_path}")
-
-cred = credentials.Certificate(str(cred_path))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+cred_path = os.path.join(BASE_DIR, "firebase", "serviceaccount.json")
 
 if not firebase_admin._apps:
+    cred = credentials.Certificate(cred_path)
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
+

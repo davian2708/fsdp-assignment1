@@ -1,70 +1,146 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  CartesianGrid,
+  ReferenceDot,
 } from "recharts";
 import "../styles/homepage.css";
 
-const data = [
-  { day: "Mon", usage: 30 },
-  { day: "Tue", usage: 50 },
-  { day: "Wed", usage: 40 },
-  { day: "Thu", usage: 70 },
-  { day: "Fri", usage: 20 },
-  { day: "Sat", usage: 45 },
-  { day: "Sun", usage: 60 },
-];
+// Firebase
+import { db } from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function UsageChart() {
+  const [data, setData] = useState([]);
+  const [peakDay, setPeakDay] = useState(null);
+
+  useEffect(() => {
+    const fetchQuestionsPerDay = async () => {
+      const snap = await getDocs(collection(db, "messages"));
+
+      const orderedDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+      const currentWeek = {};
+      const lastWeek = {};
+
+      orderedDays.forEach((d) => {
+        currentWeek[d] = 0;
+        lastWeek[d] = 0;
+      });
+
+      const now = new Date();
+
+      snap.docs.forEach((doc) => {
+        const { sender, createdAt } = doc.data();
+        if (sender !== "user" || !createdAt) return;
+
+        const date = createdAt.toDate();
+        const dayIndex = (date.getDay() + 6) % 7;
+        const day = orderedDays[dayIndex];
+
+        const diffDays = Math.floor(
+          (now - date) / (1000 * 60 * 60 * 24)
+        );
+
+        if (diffDays < 7) currentWeek[day]++;
+        else if (diffDays < 14) lastWeek[day]++;
+      });
+
+      const chartData = orderedDays.map((day) => ({
+        day,
+        questions: currentWeek[day],
+        lastWeek: lastWeek[day],
+        trend:
+          lastWeek[day] === 0
+            ? "—"
+            : currentWeek[day] > lastWeek[day]
+            ? "↑"
+            : currentWeek[day] < lastWeek[day]
+            ? "↓"
+            : "→",
+      }));
+
+      const peak = chartData.reduce((max, d) =>
+        d.questions > max.questions ? d : max
+      );
+
+      setPeakDay(peak);
+      setData(chartData);
+    };
+
+    fetchQuestionsPerDay();
+  }, []);
+
   return (
     <div className="usage-card">
-      <h3>Usage Overview</h3>
-      <div className="chart-container">
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart
-            data={data}
-            margin={{ top: 10, right: 30, left: 0, bottom: 10 }}
-          >
-            <XAxis
-              dataKey="day"
-              stroke="#777" 
-              tickLine={false}
-              tick={{ fontSize: 13, fill: "#555" }}
-            />
-            <YAxis
-              stroke="#777" 
-              tickLine={false}
-              axisLine={{ stroke: "#e0e0e0" }} 
-              tick={{ fontSize: 13, fill: "#555" }}
-            />
+      <h3>Weekly Usage</h3>
 
-            <Tooltip
-              cursor={{ fill: "rgba(0, 0, 0, 0.05)" }}
-              contentStyle={{
-                backgroundColor: "#ffffff",
-                borderRadius: "8px",
-                border: "1px solid #e0e0e0", 
-                color: "#111",
-                padding: "8px 12px",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+      <ResponsiveContainer width="100%" height={280}>
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="day" />
+          <YAxis allowDecimals={false} />
+          <Tooltip
+            formatter={(value, name, props) => {
+              if (name === "questions") {
+                return [
+                  `${value} questions`,
+                  `This Week (${props.payload.trend} vs last week)`,
+                ];
+              }
+              return value;
+            }}
+          />
+
+          {/* MAIN LINE */}
+          <Line
+            type="monotone"
+            dataKey="questions"
+            stroke="#4a4a4a"
+            strokeWidth={3}
+            dot={{ r: 5 }}
+            activeDot={{ r: 7 }}
+            label={({ x, y, value }) => {
+              const maxValue = Math.max(...data.map(d => d.questions));
+              const isPeak = value === maxValue;
+
+              if (isPeak) return null;
+
+              return (
+                <text
+                  x={x}
+                  y={y - 14}
+                  textAnchor="middle"
+                  fill="#555"
+                  fontSize={12}
+                >
+                  {value}
+                </text>
+              );
+            }}
+          />
+          {/* PEAK DAY HIGHLIGHT */}
+          {peakDay && (
+            <ReferenceDot
+              x={peakDay.day}
+              y={peakDay.questions}
+              r={8}
+              fill="#0022ff"
+              stroke="none"
+              label={{
+                value: "Peak",
+                position: "top",
+                fill: "#0022ff",
+                fontWeight: 600,
               }}
-              itemStyle={{ color: "#111" }}
-              labelStyle={{ fontWeight: 600, color: "#333" }}
             />
-
-            <Bar
-              dataKey="usage"
-              fill="#4a4a4a" 
-              radius={[6, 6, 0, 0]}
-              activeBar={{ fill: "#fffff" }} 
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+          )}
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 }
