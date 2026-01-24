@@ -2,8 +2,8 @@
   display: flex;
   height: 100vh;
   width: 100%;
-  background: var(--bg-primary); 
-  color: var(--text-primary);    
+  background: var(--bg-primary);
+  color: var(--text-primary);
   overflow-x: hidden;
 }
 
@@ -30,10 +30,10 @@
 }
 
 .view-logo-img {
-  height: 30px; 
-  width: auto; 
-  display: block; 
-  margin: 0 auto; 
+  height: 30px;
+  width: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 body.light-mode .logo {
@@ -45,21 +45,21 @@ body.light-mode .logo {
   margin-bottom: 20px;
 }
 
-/* --- SEARCH & INPUT --- */
+/* --- SEARCH --- */
 .view-search {
   width: 60%;
   margin: 0 auto;
   display: block;
   padding: 14px 20px;
   border-radius: 12px;
-  border: 1px solid var(--border-color); 
-  background: var(--bg-input);          
-  color: var(--text-primary);           
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
   font-size: 16px;
   margin-bottom: 25px;
 }
 
-/* --- BUTTON & FILTER --- */
+/* --- FILTERS --- */
 .view-filters {
   display: flex;
   justify-content: center;
@@ -68,20 +68,20 @@ body.light-mode .logo {
 }
 
 .filter-btn {
-  background: var(--bg-input);          
+  background: var(--bg-input);
   padding: 10px 18px;
   border-radius: 20px;
-  color: var(--text-primary);           
-  border: 1px solid var(--border-color); 
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   cursor: pointer;
 }
 
 .filter-btn.active {
-  background: var(--text-primary);      
-  color: var(--bg-primary);             
+  background: var(--text-primary);
+  color: var(--bg-primary);
 }
 
-/* --- AGENT CARD --- */
+/* --- AGENT GRID --- */
 .agents-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -89,9 +89,11 @@ body.light-mode .logo {
   padding-bottom: 50px;
 }
 
+/* --- AGENT CARD --- */
 .agent-card {
-  background: var(--bg-secondary);      
-  border: 1px solid var(--border-color); 
+  position: relative; /* 🔥 REQUIRED for status badge */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   padding: 18px;
   border-radius: 12px;
   display: flex;
@@ -102,13 +104,13 @@ body.light-mode .logo {
 }
 
 .agent-card:hover {
-  background: var(--border-color);      
+  background: var(--border-color);
 }
 
 .agent-image-box {
   width: 90px;
   height: 90px;
-  background: var(--bg-input);          
+  background: var(--bg-input);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -125,28 +127,72 @@ body.light-mode .logo {
 
 .agent-info p {
   margin: 2px 0 6px 0;
-  color: var(--text-secondary);         
+  color: var(--text-secondary);
 }
 
 .agent-created {
   font-size: 12px;
-  color: var(--text-secondary);         
+  color: var(--text-secondary);
 }
 
+/* Settings icon (kept for future use) */
 .agent-settings {
   margin-left: auto;
-  color: var(--text-secondary);         
+  color: var(--text-secondary);
   cursor: pointer;
+  z-index: 2;
 }
 
-/* Mobile & small tablets */
-@media (max-width: 768px) {
+/* --- STATUS BADGE (Enable / Disable) --- */
+.status-badge {
+  position: absolute;
+  top: 14px;
+  right: 48px; /* space before ⚙️ */
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  z-index: 2;
+}
 
+.status-badge.active {
+  background: #22c55e;
+  color: #000;
+}
+
+.status-badge.disabled {
+  background: #6b7280;
+  color: #fff;
+}
+
+/* Disabled agent look */
+.agent-card.disabled {
+  opacity: 0.45;
+  filter: grayscale(1);
+}
+
+/* Delete icon (danger action) */
+.agent-delete {
+  position: absolute;
+  top: 14px;
+  right: 12px;
+  color: #ef4444;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.agent-delete:hover {
+  color: #dc2626;
+}
+
+
+/* --- MOBILE & SMALL TABLETS --- */
+@media (max-width: 768px) {
   .view-panel {
     padding: 20px 16px;
   }
 
-  /* Logo */
   .view-logo-img {
     height: 26px;
   }
@@ -156,7 +202,6 @@ body.light-mode .logo {
     margin-bottom: 16px;
   }
 
-  /* Search bar */
   .view-search {
     width: 95%;
     padding: 10px 14px;
@@ -165,9 +210,7 @@ body.light-mode .logo {
     margin-bottom: 20px;
   }
 
-  /* Filters */
   .view-filters {
-    display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
     gap: 8px;
@@ -185,13 +228,11 @@ body.light-mode .logo {
     font-weight: 600;
   }
 
-  /* Grid → single column */
   .agents-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  /* Cards */
   .agent-card {
     padding: 14px;
     gap: 14px;
@@ -215,7 +256,7 @@ body.light-mode .logo {
   }
 }
 
-/* Tablets */
+/* --- TABLETS --- */
 @media (min-width: 769px) and (max-width: 1024px) {
   .view-panel {
     padding: 20px 16px;
@@ -242,7 +283,7 @@ body.light-mode .logo {
   }
 }
 
-/* Large screens */
+/* --- LARGE SCREENS --- */
 @media (min-width: 1440px) {
   .view-panel {
     padding: 48px 80px;

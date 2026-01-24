@@ -54,6 +54,7 @@ export default function CreateAgentPage() {
         color: selectedColor,
         tools: [],
         createdAt: serverTimestamp(),
+        isActive: true,
       };
 
       // Save to Firestore
