@@ -613,3 +613,35 @@
   font-size: 14px;
   color: var(--text-secondary);
 }
+
+.confidence-badge {
+  font-size: 12px;
+  margin-top: 6px;
+  opacity: 0.85;
+}
+
+.confidence-badge.high {
+  color: #2ecc71;
+}
+
+.confidence-badge.medium {
+  color: #f39c12;
+}
+
+.confidence-badge.low {
+  color: #e74c3c;
+}
+
+.confidence-reasons {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #999;
+  margin-left: 14px;
+}
+
+.confidence-disclaimer {
+  font-size: 11px;
+  color: #aaa;
+  text-align: center;
+  margin-top: 8px;
+}

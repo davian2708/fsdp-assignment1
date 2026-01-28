@@ -7,6 +7,13 @@ from ..models import ChatRequest
 from dotenv import load_dotenv
 import asyncio
 from fastapi import Response
+import json
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+CONF_PATH = os.path.join(BASE_DIR, "confidence_rules.json")
+
+with open(CONF_PATH, "r") as f:
+    CONF_RULES = json.load(f)
 
 load_dotenv()
 router = APIRouter()
@@ -105,11 +112,17 @@ def call_openai_sync(system_prompt, user_text, image_base64=None):
 
 @router.post("/query")
 async def chat(req: ChatRequest):
+    # 1. Get agent
     agent = await asyncio.to_thread(get_agent_sync, req.agent_id)
 
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
+    # 2. Detect greeting (config-driven)
+    user_text = req.user_message.lower().strip()
+    is_greeting = user_text in CONF_RULES["greetings"]
+
+    # 3. Generate AI reply FIRST
     reply = await asyncio.to_thread(
         call_openai_sync,
         build_system_prompt(agent),
@@ -117,6 +130,83 @@ async def chat(req: ChatRequest):
         req.image_base64
     )
 
-    return {"reply": reply}
+    # 4. Skip confidence for greetings
+    if is_greeting:
+        return {
+            "reply": reply,
+            "confidence": None
+        }
 
+    # CONFIDENCE SIGNALS
+    # Long-term memory
+    agent_memory = agent.get("memory", []) if isinstance(agent, dict) else []
+    used_long_term_memory = len(agent_memory) > 0
 
+    # External knowledge (future extension)
+    used_external_knowledge = False
+
+    # Vague question detection (config-driven)
+    is_vague = len(req.user_message.strip()) < CONF_RULES["min_length"]
+
+    if not is_vague:
+        for phrase in CONF_RULES["vague_keywords"]:
+            if phrase in user_text:
+                is_vague = True
+                break
+
+    # Override: long, structured questions are not vague
+    if len(req.user_message.strip()) > CONF_RULES["clear_length"]:
+        is_vague = False
+
+    # Conflicting memory (simple heuristic)
+    has_conflict = False
+    for mem in agent_memory:
+        if "short" in mem.lower() and "detailed" in user_text:
+            has_conflict = True
+
+    # CONFIDENCE SCORING
+    score = 100
+    reasons = []
+
+    if not used_long_term_memory:
+        score -= 25
+        reasons.append("Limited long-term memory available")
+
+    if not used_external_knowledge:
+        score -= 20
+        reasons.append("No external knowledge enabled")
+
+    if is_vague:
+        score -= 30
+        reasons.append("User question is vague")
+
+    if len(req.user_message.strip()) < 10:
+        score -= 20
+        reasons.append("Insufficient input detail")
+
+    if has_conflict:
+        score -= 20
+        reasons.append("Conflicting memory detected")
+
+    # Positive signal: clear & specific input
+    if len(req.user_message.strip()) > CONF_RULES["clear_length"] and not is_vague:
+        score += 10
+        reasons.append("Clear and specific question")
+
+    score = min(score, 100)
+
+    if score >= 60:
+        level = "high"
+    elif score >= 30:
+        level = "medium"
+    else:
+        level = "low"
+
+    return {
+        "reply": reply,
+        "confidence": {
+            "score": score,
+            "level": level,
+            "reasons": reasons
+        }
+    }

@@ -197,6 +197,7 @@ export default function ChatInterface() {
         sender: data.sender === "assistant" ? "bot" : data.sender,
         text: data.text,
         file: data.file || null,
+        confidence: data.confidence || null,
       };
     });
 
@@ -342,12 +343,14 @@ const sendMessage = async () => {
 
 
     const aiText = res.reply;
+    const aiConfidence = res.confidence;
 
     const aiDocRef = await addDoc(collection(db, "messages"), {
       conversationId: activeConversationId,
       agentId,
       sender: "assistant",
       text: aiText,
+      confidence: aiConfidence,
       createdAt: serverTimestamp(),
     });
 
@@ -361,6 +364,7 @@ const sendMessage = async () => {
         id: aiDocRef.id,
         sender: "bot",
         text: aiText,
+        confidence: aiConfidence,
       },
     ]);
   } catch (err) {
@@ -482,10 +486,15 @@ const sendMessage = async () => {
           <div ref={messagesEndRef} />
         </div>
 
+        {/*  CONFIDENCE DISCLAIMER */}
+        <small className="confidence-disclaimer">
+          Confidence reflects system context availability, not factual accuracy.
+        </small>
+
         {/* === INPUT BOX === */}
         <div className="input-area">
         
-          {/* 🔗 CHAIN MODE INDICATOR */}
+          {/*  CHAIN MODE INDICATOR */}
           {chainMode && secondaryAgent && (
             <div className="chain-pill">
               <span className="chain-icon">🔗</span>
@@ -586,7 +595,7 @@ const sendMessage = async () => {
         )}
 
           <div className="input-box">
-            {/* 📎 File upload */}
+            {/*  File upload */}
             <label className="input-icon upload-icon">
               <FiUpload size={20} />
               <input
@@ -661,13 +670,28 @@ function MessageBubble({ msg, submitFeedback, hasFeedback }) {
 
   return (
     <div className={`message ${msg.sender === "user" ? "user" : "bot"}`}>
-      {msg.text && msg.sender === "bot" && (
+    {msg.text && msg.sender === "bot" && (
+      <>
         <div className="bot-markdown">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {msg.text}
           </ReactMarkdown>
         </div>
-      )}
+
+        {/* CONFIDENCE INDICATOR */}
+        {msg.confidence && (
+          <div className={`confidence-badge ${msg.confidence.level}`}>
+              {msg.confidence.level.toUpperCase()} confidence
+
+            <ul className="confidence-reasons">
+              {msg.confidence.reasons.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </>
+    )}
 
       {msg.text && msg.sender === "user" && (
         <span>{msg.text}</span>
