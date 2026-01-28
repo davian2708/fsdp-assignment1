@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import AuthLayout from '../../components/auth/AuthLayout'
 import TextField from '../../components/auth/TextField'
-import { validateEmail, validatePassword } from '../../utils/validators'
+import { validateEmail } from '../../utils/validators'
 import './authPages.css'
 
+import { db } from '../../firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 
 export default function SignIn() {
+  const navigate = useNavigate()   
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -14,9 +18,12 @@ export default function SignIn() {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
 
-  const emailError = useMemo(() => (submitted ? validateEmail(email) : null), [email, submitted])
+  const emailError = useMemo(
+    () => (submitted ? validateEmail(email) : null),
+    [email, submitted]
+  )
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     setSubmitted(true)
     setMessage('')
@@ -30,10 +37,26 @@ export default function SignIn() {
     }
 
     setBusy(true)
-    setTimeout(() => {
+
+    try {
+      await addDoc(collection(db, 'signins'), {
+        email,
+        createdAt: serverTimestamp()
+      })
+
+      setMessage('Signed in. Redirecting…')
+
+      // ✅ THIS IS WHAT WAS MISSING
+      setTimeout(() => {
+        navigate('/home')
+      }, 500)
+
+    } catch (error) {
+      console.error('Firestore error:', error)
+      setMessage('Failed to sign in. Please try again.')
+    } finally {
       setBusy(false)
-      setMessage('Signed in.')
-    }, 550)
+    }
   }
 
   return (

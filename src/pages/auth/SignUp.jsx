@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom'
 import AuthLayout from '../../components/auth/AuthLayout'
 import TextField from '../../components/auth/TextField'
 import { validateEmail, validatePassword } from '../../utils/validators'
+import { db } from '../../firebase'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import './authPages.css'
-
 
 export default function SignUp() {
   const [email, setEmail] = useState('')
@@ -14,10 +15,17 @@ export default function SignUp() {
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
 
-  const emailError = useMemo(() => (submitted ? validateEmail(email) : null), [email, submitted])
-  const passwordError = useMemo(() => (submitted ? validatePassword(password) : null), [password, submitted])
+  const emailError = useMemo(
+    () => (submitted ? validateEmail(email) : null),
+    [email, submitted]
+  )
 
-  function handleSubmit(e) {
+  const passwordError = useMemo(
+    () => (submitted ? validatePassword(password) : null),
+    [password, submitted]
+  )
+
+  async function handleSubmit(e) {
     e.preventDefault()
     setSubmitted(true)
     setMessage('')
@@ -28,10 +36,23 @@ export default function SignUp() {
     if (eErr || pErr) return
 
     setBusy(true)
-    setTimeout(() => {
+
+    try {
+      await addDoc(collection(db, 'users'), {
+        email,
+        createdAt: serverTimestamp()
+      })
+
+      setMessage('Account created. You can now sign in ')
+      setEmail('')
+      setPassword('')
+      setSubmitted(false)
+    } catch (error) {
+      console.error('Firestore error:', error)
+      setMessage('Failed to create account. Please try again.')
+    } finally {
       setBusy(false)
-      setMessage('Account created. You can now sign in.')
-    }, 650)
+    }
   }
 
   return (
