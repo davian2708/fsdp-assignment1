@@ -645,3 +645,38 @@
   text-align: center;
   margin-top: 8px;
 }
+
+/* === Global confidence toggle === */
+.confidence-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  margin: 0;  
+  font-size: 8px;
+  color: #aaa;
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+}
+
+.confidence-disclaimer {
+  opacity: 0.85;
+  margin: 0;
+  padding: 0;
+}
+
+.confidence-toggle-link {
+  background: none;
+  border: none;
+  color: #4da3ff;
+  cursor: pointer;
+  font-size: 11px;
+  margin: 0;
+  padding: 0;
+}
+
+.confidence-toggle-link:hover {
+  text-decoration: underline;
+}

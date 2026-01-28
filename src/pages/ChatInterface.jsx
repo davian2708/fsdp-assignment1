@@ -100,6 +100,8 @@ export default function ChatInterface() {
   const [chainMode, setChainMode] = useState(false);
   const [secondaryAgent, setSecondaryAgent] = useState(null);
 
+  const [showAllConfidence, setShowAllConfidence] = useState(false);
+
   const filteredSuggestions = agentSuggestions.filter(
   (s) => !secondaryAgent || s.agentId !== secondaryAgent.id
 );
@@ -473,23 +475,33 @@ const sendMessage = async () => {
             </div>
           )}
 
-          {/* ✅ CHAT HISTORY */}
+          {/*  CHAT HISTORY */}
           {messages.map((msg, idx) => (
             <MessageBubble
               key={idx}
               msg={msg}
               submitFeedback={submitFeedback}
               hasFeedback={hasFeedback}
+              showAllConfidence={showAllConfidence}
             />
           ))}
 
           <div ref={messagesEndRef} />
         </div>
 
-        {/*  CONFIDENCE DISCLAIMER */}
-        <small className="confidence-disclaimer">
-          Confidence reflects system context availability, not factual accuracy.
-        </small>
+        {/*  CONFIDENCE DISCLAIMER and TOGGLE */}
+        <div className="confidence-footer">
+          <small className="confidence-disclaimer">
+            Confidence reflects system context availability, not factual accuracy.
+          </small>
+
+          <button
+            className="confidence-toggle-link"
+            onClick={() => setShowAllConfidence((prev) => !prev)}
+          >
+            {showAllConfidence ? "Hide confidence details" : "Show confidence details"}
+          </button>
+        </div>
 
         {/* === INPUT BOX === */}
         <div className="input-area">
@@ -656,7 +668,7 @@ const sendMessage = async () => {
   );
 }
 
-function MessageBubble({ msg, submitFeedback, hasFeedback }) {
+function MessageBubble({ msg, submitFeedback, hasFeedback, showAllConfidence }) {
   const [rated, setRated] = useState(false);
 
   useEffect(() => {
@@ -679,10 +691,9 @@ function MessageBubble({ msg, submitFeedback, hasFeedback }) {
         </div>
 
         {/* CONFIDENCE INDICATOR */}
-        {msg.confidence && (
+        {showAllConfidence && msg.confidence && (
           <div className={`confidence-badge ${msg.confidence.level}`}>
-              {msg.confidence.level.toUpperCase()} confidence
-
+            <strong>{msg.confidence.level.toUpperCase()} confidence</strong>
             <ul className="confidence-reasons">
               {msg.confidence.reasons.map((r, i) => (
                 <li key={i}>{r}</li>
