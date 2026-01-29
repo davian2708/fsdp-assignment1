@@ -20,6 +20,25 @@ export async function createAgent(agentData) {
   return res.json();
 }
 
+export async function routeHelpRequest(prompt) {
+  const res = await fetch(`${API_BASE_URL}/help/route`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": API_KEY,
+    },
+    body: JSON.stringify({ prompt }),
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || "Help routing failed");
+  }
+
+  return res.json(); // { agentId, created, tags }
+}
+
+
 export async function listAgents() {
   const res = await fetch(`${API_BASE_URL}/agents`, {
     headers: { "x-api-key": API_KEY },

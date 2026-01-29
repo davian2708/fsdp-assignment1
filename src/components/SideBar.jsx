@@ -61,7 +61,6 @@ const SideBar = () => {
           >
             Explore
           </button>
-
           <button
             className="menu-btn"
             onClick={() => {
@@ -71,6 +70,16 @@ const SideBar = () => {
           >
             View AI Agents
           </button>
+          <button
+            className="menu-btn"
+            onClick={() => {
+              navigate("/help");
+              setOpen(false);
+            }}
+          >
+            Help
+          </button>
+
         </div>
 
         {/* Theme toggle at bottom */}

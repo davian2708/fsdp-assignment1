@@ -1,0 +1,29 @@
+.help-page {
+  padding: 2rem;
+  color: var(--text-primary);
+}
+
+.help-page h1 {
+  margin-bottom: 1rem;
+}
+
+.help-page textarea {
+  width: 100%;
+  min-height: 120px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 1rem;
+  border: none;
+  resize: vertical;
+}
+
+.help-page button {
+  margin-top: 1rem;
+  background: var(--action-btn);
+  color: white;
+  padding: 0.6rem 1.4rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
