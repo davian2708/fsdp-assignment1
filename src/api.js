@@ -29,20 +29,34 @@ export async function listAgents() {
   return res.json();
 }
 
-export async function queryAgent(agentId, message) {
-  return fetch("http://localhost:8000/chat/query", {
+export async function queryAgent(
+  agentId,
+  message,
+  imageBase64 = null,
+  chain = null
+) {
+  const body = {
+    agent_id: agentId,
+    user_message: message,
+    image_base64: imageBase64,
+    chain: chain
+      ? { secondary_agent_id: chain.secondary_agent_id }
+      : null
+  };
+
+  const res = await fetch(`${API_BASE_URL}/chat/query`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      agent_id: agentId,
-      user_message: message
-    })
-  }).then(res => {
-    if (!res.ok) throw new Error("Query failed");
-    return res.json();
+    body: JSON.stringify(body),
   });
+
+  if (!res.ok) {
+    throw new Error(`Chat request failed: ${res.status}`);
+  }
+
+  return res.json();
 }
 
 // ===== FEEDBACK ENDPOINTS =====
@@ -235,33 +249,20 @@ export async function linkAgents(primaryAgentId, secondaryAgentId) {
   });
 }
 
-export async function queryAgentChain(
-  primaryAgentId,
-  secondaryAgentId,
-  userMessage,
-  passContext = true
-) {
-  const res = await fetch(`${API_BASE_URL}/chains/query`, {
+export async function queryAgentChain(body) {
+  const res = await fetch("http://localhost:8000/chains/query", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": API_KEY,
-    },
-    body: JSON.stringify({
-      primary_agent_id: primaryAgentId,
-      secondary_agent_id: secondaryAgentId,
-      user_message: userMessage,
-      pass_context: passContext,
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {
-    const err = await res.text();
-    throw new Error(err || "Failed to query agent chain");
+    throw new Error("Chain request failed");
   }
 
   return res.json();
 }
+
 
 export async function getAgentChains(agentId) {
   const res = await fetch(`${API_BASE_URL}/chains/chains/${agentId}`, {

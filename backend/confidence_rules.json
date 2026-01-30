@@ -1,0 +1,16 @@
+{
+  "greetings": ["hello", "hi", "hey"],
+
+  "vague_keywords": [
+    "help",
+    "help me",
+    "idk",
+    "not sure",
+    "something",
+    "anything",
+    "whatever"
+  ],
+
+  "min_length": 20,
+  "clear_length": 50
+}

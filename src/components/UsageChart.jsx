@@ -19,6 +19,27 @@ export default function UsageChart() {
   const [data, setData] = useState([]);
   const [peakDay, setPeakDay] = useState(null);
 
+  const startOfWeek = (date) => {
+  const d = new Date(date);
+  const day = d.getDay() || 7; // Sunday = 7
+  d.setDate(d.getDate() - day + 1);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+  const endOfWeek = (date) => {
+    const d = startOfWeek(date);
+    d.setDate(d.getDate() + 6);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  };
+
+  const startOfDay = (d) => {
+  const date = new Date(d);
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+
   useEffect(() => {
     const fetchQuestionsPerDay = async () => {
       const snap = await getDocs(collection(db, "messages"));
@@ -34,6 +55,15 @@ export default function UsageChart() {
 
       const now = new Date();
 
+      const currentWeekStart = startOfWeek(now);
+      const currentWeekEnd = endOfWeek(now);
+
+      const lastWeekStart = new Date(currentWeekStart);
+      lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+
+      const lastWeekEnd = new Date(currentWeekEnd);
+      lastWeekEnd.setDate(lastWeekEnd.getDate() - 7);
+
       snap.docs.forEach((doc) => {
         const { sender, createdAt } = doc.data();
         if (sender !== "user" || !createdAt) return;
@@ -42,12 +72,14 @@ export default function UsageChart() {
         const dayIndex = (date.getDay() + 6) % 7;
         const day = orderedDays[dayIndex];
 
-        const diffDays = Math.floor(
-          (now - date) / (1000 * 60 * 60 * 24)
-        );
+        const today = startOfDay(new Date());
+        const msgDate = startOfDay(date);
 
-        if (diffDays < 7) currentWeek[day]++;
-        else if (diffDays < 14) lastWeek[day]++;
+        if (msgDate >= currentWeekStart && msgDate <= currentWeekEnd) {
+          currentWeek[day]++;
+        } else if (msgDate >= lastWeekStart && msgDate <= lastWeekEnd) {
+          lastWeek[day]++;
+        }
       });
 
       const chartData = orderedDays.map((day) => ({
@@ -85,16 +117,22 @@ export default function UsageChart() {
           <XAxis dataKey="day" />
           <YAxis allowDecimals={false} />
           <Tooltip
-            formatter={(value, name, props) => {
-              if (name === "questions") {
-                return [
-                  `${value} questions`,
-                  `This Week (${props.payload.trend} vs last week)`,
-                ];
-              }
-              return value;
-            }}
-          />
+          cursor={{ stroke: "rgba(255,255,255,0.2)" }}
+          content={({ active, payload, label }) => {
+            if (!active || !payload || !payload.length) return null;
+
+            const { questions, lastWeek } = payload[0].payload;
+
+            return (
+              <div className="custom-tooltip">
+                <strong>{label}</strong>
+                <div>This week: {questions}</div>
+                <div>Last week: {lastWeek}</div>
+              </div>
+            );
+          }}
+        />
+
 
           {/* MAIN LINE */}
           <Line

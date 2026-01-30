@@ -271,6 +271,21 @@
   background-color: var(--text-secondary);
 }
 
+.custom-tooltip {
+  background: #1f1f1f;        
+  color: #ffffff;              
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+}
+
+.custom-tooltip strong {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
 /*RESPONSIVE ADJUSTMENTS – HOMEPAGE*/
 /* Small screens (phones) */
 @media (max-width: 640px) {

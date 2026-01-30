@@ -3,14 +3,16 @@ import { FiLink2, FiSend, FiChevronDown } from "react-icons/fi";
 import { listAgents, queryAgentChain, linkAgents  } from "../api";
 import "../styles/agentchaining.css";
 
-export default function AgentChaining({ primaryAgentId }) {
+export default function AgentChaining({ primaryAgentId, onChainSelected }) {
   const [agents, setAgents] = useState([]);
-  const [selectedAgent, setSelectedAgent] = useState(null);
+  // const [selectedAgent, setSelectedAgent] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [chainInput, setChainInput] = useState("");
-  const [chainMessages, setChainMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [showChainChat, setShowChainChat] = useState(false);
+  // const [chainInput, setChainInput] = useState("");
+  // const [chainMessages, setChainMessages] = useState([]);
+  // const [loading, setLoading] = useState(false);
+  // const [showChainChat, setShowChainChat] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState(null);
+
 
   useEffect(() => {
     loadAvailableAgents();
@@ -27,10 +29,29 @@ export default function AgentChaining({ primaryAgentId }) {
     }
   };
 
+// const selectAgent = async (agent) => {
+//   try {
+//     console.log("Linking agents:", primaryAgentId, agent.id);
+
+
+//     await linkAgents(primaryAgentId, agent.id);
+
+//     console.log("Agents linked successfully");
+
+//     setSelectedAgent(agent);
+//     setShowDropdown(false);
+//     setShowChainChat(true);
+//     setChainMessages([]);
+//     setChainInput("");
+//   } catch (err) {
+//     console.error("Failed to link agents:", err);
+//     alert("Failed to link agents. Check backend logs.");
+//   }
+// };
+
 const selectAgent = async (agent) => {
   try {
     console.log("Linking agents:", primaryAgentId, agent.id);
-
 
     await linkAgents(primaryAgentId, agent.id);
 
@@ -38,9 +59,12 @@ const selectAgent = async (agent) => {
 
     setSelectedAgent(agent);
     setShowDropdown(false);
-    setShowChainChat(true);
-    setChainMessages([]);
-    setChainInput("");
+
+    onChainSelected({
+      enabled: true,
+      secondaryAgent: agent,
+    });
+
   } catch (err) {
     console.error("Failed to link agents:", err);
     alert("Failed to link agents. Check backend logs.");
@@ -103,65 +127,65 @@ const selectAgent = async (agent) => {
     }
   };
 
-  if (showChainChat && selectedAgent) {
-    return (
-      <div className="chain-interface">
-        <div className="chain-header-simple">
-          <button
-            className="chain-back-btn"
-            onClick={() => {
-              setShowChainChat(false);
-              setSelectedAgent(null);
-              setChainMessages([]);
-            }}
-          >
-            ← Back
-          </button>
-          <div className="chain-title">
-            <h4>Chaining with {selectedAgent.name}</h4>
-            <p>Messages sent through both agents</p>
-          </div>
-        </div>
+  // if (showChainChat && selectedAgent) {
+  //   return (
+  //     <div className="chain-interface">
+  //       <div className="chain-header-simple">
+  //         <button
+  //           className="chain-back-btn"
+  //           onClick={() => {
+  //             setShowChainChat(false);
+  //             setSelectedAgent(null);
+  //             setChainMessages([]);
+  //           }}
+  //         >
+  //           ← Back
+  //         </button>
+  //         <div className="chain-title">
+  //           <h4>Chaining with {selectedAgent.name}</h4>
+  //           <p>Messages sent through both agents</p>
+  //         </div>
+  //       </div>
 
-        <div className="chain-messages-list">
-          {chainMessages.map((msg, idx) => (
-            <div key={idx} className={`chain-msg ${msg.sender}`}>
-              <div className="msg-bubble">
-                <p>{msg.text}</p>
-                {msg.agentResponses && (
-                  <div className="agent-responses-mini">
-                    {msg.agentResponses.map((resp, i) => (
-                      <div key={resp.agent_name} className="agent-resp-mini">
-                        <strong>{resp.agent_name}:</strong>
-                        <p>{resp.response}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+  //       <div className="chain-messages-list">
+  //         {chainMessages.map((msg, idx) => (
+  //           <div key={idx} className={`chain-msg ${msg.sender}`}>
+  //             <div className="msg-bubble">
+  //               <p>{msg.text}</p>
+  //               {msg.agentResponses && (
+  //                 <div className="agent-responses-mini">
+  //                   {msg.agentResponses.map((resp, i) => (
+  //                     <div key={resp.agent_name} className="agent-resp-mini">
+  //                       <strong>{resp.agent_name}:</strong>
+  //                       <p>{resp.response}</p>
+  //                     </div>
+  //                   ))}
+  //                 </div>
+  //               )}
+  //             </div>
+  //           </div>
+  //         ))}
+  //       </div>
 
-        <div className="chain-input-simple">
-          <input
-            type="text"
-            placeholder="Type message for chain..."
-            value={chainInput}
-            onChange={(e) => setChainInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleChainQuery()}
-            disabled={loading}
-          />
-          <button
-            onClick={handleChainQuery}
-            disabled={loading || !chainInput.trim()}
-          >
-            <FiSend size={16} />
-          </button>
-        </div>
-      </div>
-    );
-  }
+  //       <div className="chain-input-simple">
+  //         <input
+  //           type="text"
+  //           placeholder="Type message for chain..."
+  //           value={chainInput}
+  //           onChange={(e) => setChainInput(e.target.value)}
+  //           onKeyDown={(e) => e.key === "Enter" && handleChainQuery()}
+  //           disabled={loading}
+  //         />
+  //         <button
+  //           onClick={handleChainQuery}
+  //           disabled={loading || !chainInput.trim()}
+  //         >
+  //           <FiSend size={16} />
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="chain-dropdown-wrapper">

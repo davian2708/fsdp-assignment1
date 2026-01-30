@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 from enum import Enum
 
 class AgentCreateRequest(BaseModel):
@@ -15,6 +15,7 @@ class ChatRequest(BaseModel):
     agent_id: str
     user_message: str
     image_base64: Optional[str] = None
+    chain: Optional[Dict] = None
 
 # === FEEDBACK SYSTEM ===
 class FeedbackType(str, Enum):

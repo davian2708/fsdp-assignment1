@@ -13,6 +13,9 @@ import {
 } from "react-icons/fi";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { orderBy } from "firebase/firestore";
+import { useSearchParams } from "react-router-dom";
 
 
 import { db } from "../firebase";
@@ -27,50 +30,92 @@ import {
   where,
   getDocs,
 } from "firebase/firestore";
-import { queryAgent } from "../api"; // <-- backend chat call
+import { queryAgent, queryAgentChain } from "../api"; // <-- backend chat call
 
 // Auto-suggest agent based on user message
-function suggestAgentFromMessage(message, agents) {
-  if (!message || agents.length === 0) return null;
+function suggestAgentsFromMessage(message, agents, currentAgentId) {
+  if (!message || agents.length === 0) return [];
 
   const text = message.toLowerCase();
 
+  // Track which specialties are already covered
+  const matchedSpecialties = new Set();
+  const suggestions = [];
+
   for (const agent of agents) {
+    // Never suggest current agent
+    if (agent.id === currentAgentId) continue;
     if (!agent.specialties) continue;
 
-    for (const keyword of agent.specialties) {
-      if (text.includes(keyword.toLowerCase())) {
-        return {
+    for (const rawKeyword of agent.specialties) {
+      const keyword = rawKeyword.toLowerCase();
+
+      // keyword appears in message AND not already suggested
+      if (
+        text.includes(keyword) &&
+        !matchedSpecialties.has(keyword)
+      ) {
+        matchedSpecialties.add(keyword);
+
+        suggestions.push({
           agentId: agent.id,
           label: agent.name,
-          reason: `This matches the agent's specialty: ${keyword}`
-        };
+          reason: `Matches: ${keyword}`
+        });
+
+        // move to next agent after first specialty match
+        break;
       }
     }
   }
 
-  return null;
+  return suggestions;
 }
-
 
 export default function ChatInterface() {
   const { agentId } = useParams();
   const navigate = useNavigate();
 
+  const [searchParams] = useSearchParams();
+  const urlConversationId = searchParams.get("conversationId");
+  const [conversationId, setConversationId] = useState(null);
+
   const [agent, setAgent] = useState(null);
   const [messages, setMessages] = useState([]);
+  
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const [allAgents, setAllAgents] = useState([]);
-  const [agentSuggestion, setAgentSuggestion] = useState(null);
 
-    const [showKB, setShowKB] = useState(false);
+  const [allAgents, setAllAgents] = useState([]);
+  const [agentSuggestions, setAgentSuggestions] = useState([]);
+
+  const [showKB, setShowKB] = useState(false);
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [sessionId, setSessionId] = useState(() => `session_${Date.now()}`);
   const messagesEndRef = useRef(null);
+
+  const [chainMode, setChainMode] = useState(false);
+  const [secondaryAgent, setSecondaryAgent] = useState(null);
+
+  const [showAllConfidence, setShowAllConfidence] = useState(false);
+
+  const filteredSuggestions = agentSuggestions.filter(
+  (s) => !secondaryAgent || s.agentId !== secondaryAgent.id
+);
+
+  useEffect(() => {
+    if (urlConversationId) {
+      setConversationId(urlConversationId);
+    } else {
+      // New chat
+      setConversationId(null);
+      setMessages([]);
+    }
+  }, [urlConversationId]);
+
 
   // Fetch agent metadata from Firestore
   useEffect(() => {
@@ -86,13 +131,13 @@ export default function ChatInterface() {
           });
 
           // Initial greeting message from bot
-          setMessages([
-            {
-              id: `greeting_${Date.now()}`,
-              sender: "bot",
-              text: `Hi User, I am ${data.name}. How can I help you today?`,
-            },
-          ]);
+          // setMessages([
+          //   {
+          //     id: `greeting_${Date.now()}`,
+          //     sender: "bot",
+          //     text: `Hi User, I am ${data.name}. How can I help you today?`,
+          //   },
+          // ]);
         } else {
           alert("Agent not found in database.");
         }
@@ -106,6 +151,65 @@ export default function ChatInterface() {
     loadAgent();
   }, [agentId]);
 
+  // useEffect(() => {
+  //   async function loadConversation() {
+  //     const q = query(
+  //       collection(db, "conversations"),
+  //       where("agentId", "==", agentId),
+  //       where("userId", "==", "user"),
+  //       orderBy("updatedAt", "desc")
+  //     );
+
+  //     const snap = await getDocs(q);
+
+  //     if (!snap.empty) {
+  //       // use latest conversation
+  //       setConversationId(snap.docs[0].id);
+  //     } 
+  //   }
+
+  //   loadConversation();
+  // }, [agentId]);
+
+  useEffect(() => {
+    if (conversationId) {
+      console.log("Conversation ID:", conversationId);
+    }
+  }, [conversationId]);
+
+  useEffect(() => {
+  if (!conversationId) return;
+
+  // Clear immediately so UI doesn't flash old chat
+  setMessages([]);
+
+  async function loadMessages() {
+    const q = query(
+      collection(db, "messages"),
+      where("conversationId", "==", conversationId),
+      orderBy("createdAt", "asc")
+    );
+
+    const snap = await getDocs(q);
+
+    const history = snap.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        sender: data.sender === "assistant" ? "bot" : data.sender,
+        text: data.text,
+        file: data.file || null,
+        confidence: data.confidence || null,
+      };
+    });
+
+    setMessages(history);
+  }
+
+  loadMessages();
+}, [conversationId]);
+
+
     useEffect(() => {
   async function loadAgentsForSuggestion() {
     const snap = await getDocs(collection(db, "agents"));
@@ -117,6 +221,12 @@ export default function ChatInterface() {
 
   loadAgentsForSuggestion();
   }, []);
+
+  useEffect(() => {
+  messagesEndRef.current?.scrollIntoView({
+    behavior: "smooth",
+  });
+}, [messages]);
 
   const fileToBase64 = (file) =>
   new Promise((resolve, reject) => {
@@ -150,60 +260,131 @@ export default function ChatInterface() {
     return "📎";
   };
 
+  const createConversationIfNeeded = async (firstMessage) => {
+    if (conversationId) return conversationId;
+
+    const convoRef = await addDoc(collection(db, "conversations"), {
+      agentId,
+      userId: "user",
+      title: firstMessage.slice(0, 40), // ✅ ChatGPT-style title
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    setConversationId(convoRef.id);
+    return convoRef.id;
+  };
+
+
+
   // Send message to backend and get AI response
-  const sendMessage = async () => {
-    if (!input.trim() && !selectedFile) return;
+const sendMessage = async () => {
+  if (!input.trim() && !selectedFile) return;
 
-    const userMessage = input;
-    setInput("");
-      let fileData = null;
+  // DEFINE FIRST
+  const userMessage = input;
+  setInput("");
 
-    if (selectedFile) {
-      fileData = await prepareFileForFirestore(selectedFile);
-      setSelectedFile(null);
-      setFilePreview(null);
-    }
-    // Show user's message in chat
-    setMessages((prev) => [...prev, { sender: "user", text: userMessage, file: fileData}]);
+  // CREATE CONVERSATION IF NEEDED
+  let activeConversationId = conversationId;
 
-    //  AUTO-SAVE USER QUESTION
+  if (!activeConversationId) {
+    const convoRef = await addDoc(collection(db, "conversations"), {
+      agentId,
+      userId: "user",
+      title: userMessage.slice(0, 40), 
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    activeConversationId = convoRef.id;
+    setConversationId(convoRef.id);
+  }
+
+  let fileData = null;
+  if (selectedFile) {
+    fileData = await prepareFileForFirestore(selectedFile);
+    setSelectedFile(null);
+    setFilePreview(null);
+  }
+
+  
+  const imageBase64 = fileData?.base64 || null;
+  setMessages((prev) => [
+    ...prev,
+    { sender: "user", text: userMessage, file: fileData },
+  ]);
+
   await addDoc(collection(db, "messages"), {
+    conversationId: activeConversationId,
     agentId,
     sender: "user",
-    sessionId,
     text: userMessage,
     file: fileData,
     createdAt: serverTimestamp(),
   });
 
-    try {
-      // Send message + agentId to backend
-      const res = await queryAgent(agentId, userMessage, fileData?.base64 ? fileData.base64 : null);
+  try {
+    let res;
 
-      const aiDocRef = await addDoc(collection(db, "messages"), {
-        agentId,
-        sender: "ai",
-        sessionId,
-        text: res.reply,
-        createdAt: serverTimestamp(),
+    if (chainMode && secondaryAgent) {
+      res = await queryAgentChain({
+        primary_agent_id: agentId,
+        secondary_agent_id: secondaryAgent.id,
+        user_message: userMessage,
+        pass_context: true
       });
-
-      // Append AI response
-      setMessages((prev) => [...prev, {id:aiDocRef.id, sender: "bot", text: res.reply, messageId: aiDocRef.id}]);
-    } catch (err) {
-      console.error("Error sending message:", err);
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: "Sorry, something went wrong." },
-      ]);
+    } else {
+      res = await queryAgent(
+        agentId,
+        userMessage,
+        imageBase64
+      );
     }
-  };
+
+
+
+    const aiText = res.reply;
+    const aiConfidence = res.confidence;
+
+    const aiDocRef = await addDoc(collection(db, "messages"), {
+      conversationId: activeConversationId,
+      agentId,
+      sender: "assistant",
+      text: aiText,
+      confidence: aiConfidence,
+      createdAt: serverTimestamp(),
+    });
+
+    await updateDoc(doc(db, "conversations", activeConversationId), {
+      updatedAt: serverTimestamp(),
+    });
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: aiDocRef.id,
+        sender: "bot",
+        text: aiText,
+        confidence: aiConfidence,
+      },
+    ]);
+  } catch (err) {
+    console.error(err);
+    setMessages((prev) => [
+      ...prev,
+      { sender: "bot", text: "Something went wrong." },
+    ]);
+  }
+};
+
+
 
     const submitFeedback = async (messageId, satisfied) => {
     await addDoc(collection(db, "feedback"), {
       messageId,
       agentId,
-      sessionId,
+      conversationId,
       satisfied,
       createdAt: serverTimestamp(),
     });
@@ -212,7 +393,8 @@ export default function ChatInterface() {
   const hasFeedback = async (messageId) => {
     const q = query(
       collection(db, "feedback"),
-      where("messageId", "==", messageId)
+      where("messageId", "==", messageId),
+      where("conversationId", "==", conversationId)
     );
     const snap = await getDocs(q);
     return !snap.empty;
@@ -261,7 +443,14 @@ export default function ChatInterface() {
             >
               📚 KB
             </button>
-            <AgentChaining primaryAgentId={agentId} />
+            {/* <AgentChaining primaryAgentId={agentId} /> */}
+            <AgentChaining
+              primaryAgentId={agentId}
+              onChainSelected={({ enabled, secondaryAgent }) => {
+                setChainMode(enabled);
+                setSecondaryAgent(secondaryAgent);
+              }}
+            />
             <button className="chat-btn">
               <FiSend size={18} /> Chat
             </button>
@@ -272,48 +461,117 @@ export default function ChatInterface() {
         {showKB && <KnowledgeBase agentId={agentId} />}
 
         {/* === CHAT MESSAGES === */}
-                <div className="messages-container">
+        <div className="messages-container">
+
+          {/* GREETING / EMPTY STATE */}
+          {!conversationId && messages.length === 0 && (
+            <div className="empty-chat">
+              <div className="empty-avatar" style={{ backgroundColor: agent.color }}>
+                {agent.icon || "🤖"}
+              </div>
+
+              <h3>Hi! I’m {agent.name}</h3>
+              <p>How can I help you today?</p>
+            </div>
+          )}
+
+          {/*  CHAT HISTORY */}
           {messages.map((msg, idx) => (
             <MessageBubble
               key={idx}
               msg={msg}
               submitFeedback={submitFeedback}
               hasFeedback={hasFeedback}
+              showAllConfidence={showAllConfidence}
             />
           ))}
+
           <div ref={messagesEndRef} />
+        </div>
+
+        {/*  CONFIDENCE DISCLAIMER and TOGGLE */}
+        <div className="confidence-footer">
+          <small className="confidence-disclaimer">
+            Confidence reflects system context availability, not factual accuracy.
+          </small>
+
+          <button
+            className="confidence-toggle-link"
+            onClick={() => setShowAllConfidence((prev) => !prev)}
+          >
+            {showAllConfidence ? "Hide confidence details" : "Show confidence details"}
+          </button>
         </div>
 
         {/* === INPUT BOX === */}
         <div className="input-area">
-
-        {agentSuggestion && (
-            <div className="agent-suggestion">
-              <span>
-                💡 <strong>Suggested Agent:</strong> {agentSuggestion.label}
+        
+          {/*  CHAIN MODE INDICATOR */}
+          {chainMode && secondaryAgent && (
+            <div className="chain-pill">
+              <span className="chain-icon">🔗</span>
+              <span className="chain-text">
+                Chaining with <strong>{secondaryAgent.name}</strong>
               </span>
-
-              <p className="suggestion-reason">
-                {agentSuggestion.reason}
-              </p>
-
               <button
+                className="chain-close"
                 onClick={() => {
-                  // navigate to a different agent
-                  // (replace these IDs with your real agent IDs)
-                  navigate(`/agent-chat/${agentSuggestion.agentId}`);
-                  setAgentSuggestion(null);
+                  setChainMode(false);
+                  setSecondaryAgent(null);
                 }}
+                aria-label="Disable chaining"
               >
-                Use {agentSuggestion.label}
+                ✕
               </button>
+            </div>
+          )}
 
-              <button
-                className="ignore-btn"
-                onClick={() => setAgentSuggestion(null)}
-              >
-                Ignore
-              </button>
+          {filteredSuggestions.length > 0 && (
+            <div className="agent-suggestion-list">
+
+              {/*  Ignore ALL suggestions */}
+              <div className="suggestion-list-header">
+                <span> Suggested agents</span>
+                <button
+                  className="ignore-all-btn"
+                  onClick={() => setAgentSuggestions([])}
+                  title="Ignore all suggestions"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {filteredSuggestions.map((s) => (
+                <div key={s.agentId} className="agent-suggestion-card">
+                  <div className="suggestion-header">
+                     <strong>{s.label}</strong>
+                  </div>
+
+                  <p className="suggestion-reason">{s.reason}</p>
+
+                  <div className="suggestion-actions">
+                    <button
+                      onClick={() => {
+                        navigate(`/agent-chat/${s.agentId}`);
+                        setAgentSuggestions([]);
+                      }}
+                    >
+                      Use {s.label}
+                    </button>
+
+                    <button
+                      className="ignore-btn"
+                      onClick={() =>
+                        setAgentSuggestions((prev) =>
+                          prev.filter((a) => a.agentId !== s.agentId)
+                        )
+                      }
+                    >
+                      Ignore
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -349,7 +607,7 @@ export default function ChatInterface() {
         )}
 
           <div className="input-box">
-            {/* 📎 File upload */}
+            {/*  File upload */}
             <label className="input-icon upload-icon">
               <FiUpload size={20} />
               <input
@@ -384,8 +642,17 @@ export default function ChatInterface() {
                 const value = e.target.value;
                 setInput(value);
 
-                const suggestion = suggestAgentFromMessage(value, allAgents);
-                setAgentSuggestion(suggestion);
+              const suggestions = suggestAgentsFromMessage(
+                value,
+                allAgents,
+                agentId
+              ).filter(
+                (s) => !secondaryAgent || s.agentId !== secondaryAgent.id
+              );
+
+              setAgentSuggestions(suggestions);
+
+
               }}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             />
@@ -401,7 +668,7 @@ export default function ChatInterface() {
   );
 }
 
-function MessageBubble({ msg, submitFeedback, hasFeedback }) {
+function MessageBubble({ msg, submitFeedback, hasFeedback, showAllConfidence }) {
   const [rated, setRated] = useState(false);
 
   useEffect(() => {
@@ -415,11 +682,35 @@ function MessageBubble({ msg, submitFeedback, hasFeedback }) {
 
   return (
     <div className={`message ${msg.sender === "user" ? "user" : "bot"}`}>
-      {/*TEXT MESSAGE*/}
-      {msg.text && (
-        <ReactMarkdown>
-          {msg.text}
-        </ReactMarkdown>
+    {msg.text && msg.sender === "bot" && (
+      <>
+        <div className="bot-markdown">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {msg.text}
+          </ReactMarkdown>
+        </div>
+
+        {/* CONFIDENCE INDICATOR */}
+        {showAllConfidence && msg.confidence && (
+          <div className={`confidence-badge ${msg.confidence.level}`}>
+            <strong>{msg.confidence.level.toUpperCase()} confidence</strong>
+            <ul className="confidence-reasons">
+              {msg.confidence.reasons.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </>
+    )}
+
+      {msg.text && msg.sender === "user" && (
+        <span>{msg.text}</span>
+      )}
+      {msg.chainMeta && (
+        <div className="agent-meta-hint">
+          Combined using {msg.chainMeta.primary} + {msg.chainMeta.secondary}
+        </div>
       )}
 
       {/*FILE MESSAGE*/}

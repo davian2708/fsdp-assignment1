@@ -26,7 +26,7 @@ def get_agent_by_id(agent_id: str) -> Optional[Dict]:
         return None
 
     data = snap.to_dict()
-    data["id"] = snap.id  # 🔥 REQUIRED
+    data["id"] = snap.id  #  REQUIRED
     return data
 
 def list_agents() -> List[Dict]:
@@ -35,7 +35,7 @@ def list_agents() -> List[Dict]:
 
     for d in docs:
         data = d.to_dict()
-        data["id"] = d.id 
+        data["id"] = d.id  #  REQUIRED
         agents.append(data)
 
     return agents
@@ -186,3 +186,35 @@ def save_chain_conversation(primary_agent_id: str, secondary_agent_id: str, user
         "created_at": datetime.now().isoformat(),
     }
     db.collection("chain_conversations").document().set(chain_data)
+
+# ===== AGENT MEMORY FUNCTIONS =====
+
+def get_agent_memory(agent_id: str) -> List[str]:
+    """
+    Retrieve long-term memory entries for an agent.
+    """
+    agent = get_agent_by_id(agent_id)
+    if not agent:
+        return []
+
+    return agent.get("memory", [])
+
+
+def add_agent_memory(agent_id: str, memory_item: str):
+    """
+    Append a new memory entry to an agent.
+    """
+    ref = db.collection(COLLECTION_AGENTS).document(agent_id)
+    snap = ref.get()
+
+    if not snap.exists:
+        return False
+
+    data = snap.to_dict()
+    memory = data.get("memory", [])
+
+    if memory_item not in memory:
+        memory.append(memory_item)
+        ref.update({"memory": memory})
+
+    return True
