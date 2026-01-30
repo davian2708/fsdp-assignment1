@@ -130,6 +130,9 @@ export default function SideBar() {
           <button className="menu-btn" onClick={() => navigate("/view-agents")}>
             View AI Agents
           </button>
+          <button className="menu-btn" onClick={() => navigate("/help")}>
+            Help
+          </button>
         </div>
 
         {/* CHAT HISTORY */}
