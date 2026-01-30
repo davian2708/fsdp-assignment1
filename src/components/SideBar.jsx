@@ -14,7 +14,6 @@ import { FiMenu, FiX, FiMoreHorizontal } from "react-icons/fi";
 import { db } from "../firebase";
 import { useTheme } from "../context/ThemeContext";
 import "../styles/sidebar.css";
-import { FiMenu, FiX, FiLogOut } from "react-icons/fi";
 
 export default function SideBar() {
   const navigate = useNavigate();
@@ -31,7 +30,7 @@ export default function SideBar() {
   const activeConversationId =
     new URLSearchParams(location.search).get("conversationId");
 
-  // Load chat history
+  // Load chat history (only for agent chat)
   useEffect(() => {
     if (!isAgentChat || !agentId) {
       setConversations([]);
@@ -49,9 +48,9 @@ export default function SideBar() {
       const snap = await getDocs(q);
 
       setConversations(
-        snap.docs.map((doc) => ({
-          id: doc.id,
-          title: doc.data().title || "New chat",
+        snap.docs.map((d) => ({
+          id: d.id,
+          title: d.data().title || "New chat",
           agentId,
         }))
       );
@@ -65,14 +64,10 @@ export default function SideBar() {
     const newTitle = prompt("Rename chat", currentTitle);
     if (!newTitle) return;
 
-    await updateDoc(doc(db, "conversations", id), {
-      title: newTitle,
-    });
+    await updateDoc(doc(db, "conversations", id), { title: newTitle });
 
     setConversations((prev) =>
-      prev.map((c) =>
-        c.id === id ? { ...c, title: newTitle } : c
-      )
+      prev.map((c) => (c.id === id ? { ...c, title: newTitle } : c))
     );
   };
 
@@ -90,128 +85,66 @@ export default function SideBar() {
     if (id === activeConversationId) {
       navigate(`/agent-chat/${agentId}`);
     }
-  const [userMenuOpen, setUserMenuOpen] = useState(false);
-
-  // 🔐 Logged-in user
-  const currentUser = localStorage.getItem("currentUser");
-  const displayName = currentUser
-    ? currentUser.split("@")[0]
-    : "Guest";
-
-  // 🧹 Logout
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    setUserMenuOpen(false);
-    setOpen(false);
-    navigate("/signin");
   };
 
   return (
     <>
       {/* MOBILE TOP BAR */}
       <div className="mobile-topbar">
-        <button className="mobile-menu-btn" onClick={() => setOpen(true)}>
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setOpen(true)}
+          aria-label="Open sidebar"
+        >
           <FiMenu size={22} />
         </button>
       </div>
 
-      {open && (
-        <div className="sidebar-backdrop" onClick={() => setOpen(false)} />
-      )}
-
-      <aside className={`sidebar ${open ? "open" : ""}`}>
-        <button className="sidebar-close-btn" onClick={() => setOpen(false)}>
-          <FiX size={20} />
-        </button>
-
-        {/* USER */}
-        <div className="user-profile">
       {/* BACKDROP */}
       {open && (
         <div
           className="sidebar-backdrop"
-          onClick={() => {
-            setOpen(false);
-            setUserMenuOpen(false);
-          }}
+          onClick={() => setOpen(false)}
         />
       )}
 
       {/* SIDEBAR */}
-      <div className={`sidebar ${open ? "open" : ""}`}>
-        {/* Mobile close button */}
+      <aside className={`sidebar ${open ? "open" : ""}`}>
         <button
           className="sidebar-close-btn"
-          onClick={() => {
-            setOpen(false);
-            setUserMenuOpen(false);
-          }}
+          onClick={() => setOpen(false)}
           aria-label="Close sidebar"
         >
           <FiX size={20} />
         </button>
 
-        {/* USER PROFILE (CLICKABLE) */}
-        <div
-          className="user-profile"
-          onClick={() => setUserMenuOpen((v) => !v)}
-          style={{ cursor: "pointer", position: "relative" }}
-        >
+        {/* USER */}
+        <div className="user-profile">
           <div className="user-icon">👤</div>
-          <p>{displayName}</p>
-
-          {/* USER DROPDOWN MENU */}
-          {userMenuOpen && currentUser && (
-            <div className="user-dropdown">
-              <button
-                className="user-dropdown-item logout"
-                onClick={handleLogout}
-              >
-                <FiLogOut style={{ marginRight: 8 }} />
-                Logout
-              </button>
-            </div>
-          )}
+          <p>User xx2f0</p>
         </div>
 
-        {/* MAIN ACTION */}
-        <button
-          className="create-agent-btn"
-          onClick={() => navigate("/create-agent")}
         {/* CREATE AGENT */}
         <button
           className="create-agent-btn"
           onClick={() => {
             navigate("/create-agent");
             setOpen(false);
-            setUserMenuOpen(false);
           }}
         >
           + Create New Agent
         </button>
-        {/*create grupchat*/}
-        <button
-          className="create-agent-btn"
-          onClick={() => navigate("/create-group")}
-        >
-          + Create Group Chat
-        </button>
 
-        {/* MENU */}
+        {/* MAIN MENU */}
         <div className="menu">
-          <button className="menu-btn" onClick={() => navigate("/explore")}>
-            Explore
-          </button>
-          <button className="menu-btn" onClick={() => navigate("/view-agents")}>
           <button
             className="menu-btn"
             onClick={() => {
-              navigate("/home");
+              navigate("/explore");
               setOpen(false);
-              setUserMenuOpen(false);
             }}
           >
-            Home
+            Explore
           </button>
 
           <button
@@ -219,12 +152,18 @@ export default function SideBar() {
             onClick={() => {
               navigate("/view-agents");
               setOpen(false);
-              setUserMenuOpen(false);
             }}
           >
             View AI Agents
           </button>
-          <button className="menu-btn" onClick={() => navigate("/help")}>
+
+          <button
+            className="menu-btn"
+            onClick={() => {
+              navigate("/help");
+              setOpen(false);
+            }}
+          >
             Help
           </button>
         </div>
@@ -258,7 +197,9 @@ export default function SideBar() {
                   {menuOpenId === c.id && (
                     <div className="history-dropdown">
                       <button
-                        onClick={() => renameConversation(c.id, c.title)}
+                        onClick={() =>
+                          renameConversation(c.id, c.title)
+                        }
                       >
                         Rename
                       </button>
@@ -279,20 +220,6 @@ export default function SideBar() {
         {/* THEME */}
         <div className="menu bottom">
           <button className="menu-btn" onClick={toggleTheme}>
-        {/* THEME TOGGLE AT BOTTOM */}
-        <div
-          className="menu"
-          style={{
-            marginTop: "auto",
-            paddingTop: "20px",
-            borderTop: "1px solid var(--border-color)",
-          }}
-        >
-          <button
-            className="menu-btn theme-toggle-btn"
-            onClick={toggleTheme}
-            title={`Switch to ${theme === "light" ? "Dark" : "Light"} Mode`}
-          >
             {theme === "light" ? "Dark Mode" : "Light Mode"}
           </button>
         </div>
@@ -300,6 +227,3 @@ export default function SideBar() {
     </>
   );
 }
-};
-
-export default SideBar;

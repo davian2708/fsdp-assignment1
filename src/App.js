@@ -1,7 +1,7 @@
 import React from "react";
 import HelpPage from "./pages/HelpPage";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+
 
 import SignIn from "./pages/auth/SignIn";
 import SignUp from "./pages/auth/SignUp";
