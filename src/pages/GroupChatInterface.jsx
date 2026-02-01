@@ -488,7 +488,7 @@ function GroupMessageBubble({ msg, currentUser, agentName, showAllConfidence }) 
   const isAssistant = msg.sender === "assistant";
   const isMine = msg.sender === currentUser;
 
-  // ✅ distinguish other members from "you"
+  // Distinguish other members from "you"
   const bubbleClass = isAssistant ? "bot" : isMine ? "user" : "other";
 
   const senderLabel = isAssistant

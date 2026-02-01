@@ -31,7 +31,7 @@ export default function ViewAgents() {
     if (!currentUser) navigate("/signin");
   }, [currentUser, navigate]);
 
-  // ✅ Load only THIS USER’S agents (Firestore query)
+  // Load only this user’s agents (Firestore query)
   useEffect(() => {
     if (!currentUser) return;
 
@@ -73,7 +73,7 @@ export default function ViewAgents() {
 
   // Enable / Disable (OWNER ONLY)
   const toggleAgentStatus = async (agentId, currentStatus) => {
-    // ✅ treat undefined as active
+    // Treat undefined as active
     const isActive = currentStatus !== false;
 
     await updateDoc(doc(db, "agents", agentId), {
@@ -85,7 +85,7 @@ export default function ViewAgents() {
     );
   };
 
-  // ❌ PERMANENT DELETE (OWNER ONLY)
+  // Permanent delete (owner only)
   const deleteAgent = async (agentId) => {
     const confirmDelete = window.confirm(
       "This will permanently delete the agent. This action cannot be undone. Continue?"
@@ -100,7 +100,7 @@ export default function ViewAgents() {
     }
   };
 
-  // ✅ Search + filter (fixed specialties matching)
+  // Search + filter (fixed specialties matching)
   const filteredAgents = useMemo(() => {
     const s = search.trim().toLowerCase();
     const f = filter.trim().toLowerCase();

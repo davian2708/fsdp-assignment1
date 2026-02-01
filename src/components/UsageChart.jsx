@@ -39,20 +39,20 @@ export default function UsageChart() {
   date.setHours(0, 0, 0, 0);
   return date;
 };
-  // 🔐 Logged-in user
+  // Logged-in user
   const currentUser = localStorage.getItem("currentUser");
 
   useEffect(() => {
     if (!currentUser) return;
 
     const fetchQuestionsPerDay = async () => {
-      // 1️⃣ Get user’s agents
+      // Get user’s agents
       const agentsSnap = await getDocs(collection(db, "agents"));
       const userAgentIds = agentsSnap.docs
         .filter((doc) => doc.data().owner === currentUser)
         .map((doc) => doc.id);
 
-      // 🚫 No agents → empty chart
+      // No agents → empty chart
       if (userAgentIds.length === 0) {
         const empty = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
           (day) => ({
@@ -67,7 +67,7 @@ export default function UsageChart() {
         return;
       }
 
-      // 2️⃣ Get messages
+      // Get messages
       const snap = await getDocs(collection(db, "messages"));
 
       const orderedDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -132,7 +132,7 @@ export default function UsageChart() {
         d.questions > max.questions ? d : max
       );
 
-      // 🧠 If all zeros, no peak
+      // If all zeros, no peak
       const hasData = chartData.some((d) => d.questions > 0);
 
       setPeakDay(hasData ? peak : null);

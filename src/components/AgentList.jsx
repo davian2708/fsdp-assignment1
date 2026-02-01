@@ -17,7 +17,7 @@ export default function AgentList() {
     async function fetchAgents() {
       const snapshot = await getDocs(collection(db, "agents"));
 
-      // ✅ match against multiple possible owner fields
+      // Match against multiple possible owner fields
       const userAgents = snapshot.docs
         .map((doc) => ({ id: doc.id, ...doc.data() }))
         .filter((agent) => {
@@ -30,8 +30,9 @@ export default function AgentList() {
           return ownerLike === currentUser;
         });
 
-      // Show recent 5 (if you have createdAt, you can sort)
-      setAgents(userAgents.slice(0, 5));
+      // Show recent active 5 (if you have createdAt, you can sort)
+      const activeAgents = userAgents.filter((agent) => agent.isActive !== false);
+      setAgents(activeAgents.slice(0, 5));
     }
 
     fetchAgents();
@@ -47,7 +48,16 @@ export default function AgentList() {
 
   return (
     <div className="agent-section">
-      <h3>Recent AI Agents</h3>
+      <div className="section-header">
+        <h3>Recent AI Agents</h3>
+        <button
+          className="view-all-btn"
+          onClick={() => navigate("/view-agents")}
+          type="button"
+        >
+          See all agents
+        </button>
+      </div>
 
       {agents.length === 0 ? (
         <p className="empty-text">No agents created yet.</p>
@@ -78,7 +88,7 @@ export default function AgentList() {
                   }
                 }}
               >
-                {/* ✅ LEFT: ICON + TEXT */}
+                {/* LEFT: ICON + TEXT */}
                 <div className="agent-left">
                   <div
                     className="agent-avatar"
@@ -96,14 +106,8 @@ export default function AgentList() {
                   </div>
                 </div>
 
-                {/* ✅ RIGHT: STATUS */}
-                <span
-                  className={
-                    isActive ? "agent-status active" : "agent-status idle"
-                  }
-                >
-                  {isActive ? "Active" : "Disabled"}
-                </span>
+                {/* RIGHT: STATUS */}
+                <span className="agent-status active">Active</span>
               </div>
             );
           })}

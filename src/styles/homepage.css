@@ -166,6 +166,37 @@
   margin-bottom: 12px;
 }
 
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.view-all-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.view-all-btn:hover {
+  background: var(--btn-bg-hover);
+  transform: translateY(-1px);
+}
+
 /* Empty state */
 .empty-text {
   color: var(--text-secondary);
@@ -175,7 +206,8 @@
 /* --- Agent row (fix vertical alignment) --- */
 .agent-row {
   display: flex;
-  align-items: center;          /* ✅ centers avatar + text vertically */
+  align-items: center;          /* centers avatar + text vertically */
+  justify-content: space-between;
   gap: 12px;
   padding: 12px 0;
   cursor: pointer;
@@ -193,7 +225,7 @@ body.light-mode .agent-row:hover {
 /* Left side (avatar + text) */
 .agent-left {
   display: flex;
-  align-items: center;          /* ✅ centers text block with avatar */
+  align-items: center;          /* centers text block with avatar */
   gap: 12px;
   min-width: 0;
 }
@@ -214,7 +246,7 @@ body.light-mode .agent-row:hover {
 .agent-info {
   display: flex;
   flex-direction: column;
-  justify-content: center;      /* ✅ keeps it centered */
+  justify-content: center;      /* keeps it centered */
   min-width: 0;
 }
 

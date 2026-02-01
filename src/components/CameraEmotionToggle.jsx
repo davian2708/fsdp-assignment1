@@ -78,7 +78,7 @@ export default function CameraEmotionToggle() {
     });
 
     intervalRef.current = setInterval(async () => {
-        console.log("tick"); // ✅ proves the loop is running
+        console.log("tick"); // Proves the loop is running
 
 
     if (!enabledRef.current || !videoRef.current) {
@@ -174,6 +174,7 @@ export default function CameraEmotionToggle() {
       <button
         onClick={toggleCamera}
         disabled={loadingModels}
+        data-tutorial="mood-cam-toggle"
         style={{
           position: "fixed",
           right: 16,

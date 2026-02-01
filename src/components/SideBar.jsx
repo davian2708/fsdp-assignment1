@@ -102,6 +102,13 @@ export default function SideBar() {
           "Switch between light and dark mode to match your preference.",
         placement: "right",
       },
+      {
+        selector: '[data-tutorial="mood-cam-toggle"]',
+        title: "Mood Cam",
+        content:
+          "Turn on Mood Cam to let the app check your mood and suggest help if needed.",
+        placement: "left",
+      },
     ],
     []
   );

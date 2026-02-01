@@ -10,7 +10,7 @@ import CreateGroupChat from "./pages/CreateGroupChat";
 import ChatInterface from "./pages/ChatInterface";
 import ViewAgents from "./pages/ViewAgents";
 import HelpPage from "./pages/HelpPage";
-import GroupChatInterface from "./pages/GroupChatInterface"; // ✅ add this
+import GroupChatInterface from "./pages/GroupChatInterface"; // add this
 
 import UserForm from "./components/UserForm";
 
@@ -43,7 +43,7 @@ function App() {
         <Route path="/agents" element={<ViewAgents />} />
 
         {/* Group chat */}
-        <Route path="/group-chat/:groupId" element={<GroupChatInterface />} /> {/* ✅ keep only this */}
+        <Route path="/group-chat/:groupId" element={<GroupChatInterface />} /> {/* keep only this */}
 
         {/* Help */}
         <Route path="/help" element={<HelpPage />} />

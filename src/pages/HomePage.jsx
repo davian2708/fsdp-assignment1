@@ -29,13 +29,13 @@ import {
 export default function HomePage() {
   const navigate = useNavigate();
 
-  // 🔐 Logged-in user
+  // Logged-in user
   const currentUser = localStorage.getItem("currentUser"); // email
 
-  // 📬 Mailbox toggle
+  // Mailbox toggle
   const [showInbox, setShowInbox] = useState(false);
 
-  // 🔴 Invite count for badge
+  // Invite count for badge
   const [inviteCount, setInviteCount] = useState(0);
 
   const [stats, setStats] = useState({
@@ -104,14 +104,14 @@ export default function HomePage() {
     []
   );
 
-  // 🚫 Redirect if not logged in
+  // Redirect if not logged in
   useEffect(() => {
     if (!currentUser) {
       navigate("/signin");
     }
   }, [currentUser, navigate]);
 
-  // ✅ LIVE invite count for badge on homepage icon
+  // Live invite count for badge on homepage icon
   useEffect(() => {
     if (!currentUser) return;
 
@@ -134,7 +134,7 @@ export default function HomePage() {
     return () => unsub();
   }, [currentUser]);
 
-  // 📊 Fetch USER-SCOPED dashboard stats
+  // Fetch user-scoped dashboard stats
   useEffect(() => {
     if (!currentUser) return;
 
@@ -226,12 +226,12 @@ export default function HomePage() {
               alignItems: "center",
             }}
           >
-            {/* 📬 Mailbox with 🔴 badge */}
+            {/* Mailbox with badge */}
             <button
               className="mailbox-btn"
               onClick={() => setShowInbox((prev) => !prev)}
               title="Group Invites"
-              style={{ position: "relative" }} // ✅ allow badge overlay
+              style={{ position: "relative" }} // allow badge overlay
             >
               <FiMail size={22} />
 
@@ -242,14 +242,14 @@ export default function HomePage() {
               )}
             </button>
 
-            {/* ⚙️ Settings */}
+            {/* Settings */}
             <button className="settings-btn" title="Settings">
               <FiSettings className="settings-icon" />
             </button>
           </div>
         </div>
 
-        {/* 📬 Invite Inbox */}
+        {/* Invite Inbox */}
         {showInbox && <InviteInbox />}
 
         {/* Stats */}

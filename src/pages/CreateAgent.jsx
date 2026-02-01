@@ -21,7 +21,7 @@ import {
 export default function CreateAgentPage() {
   const navigate = useNavigate();
 
-  // 🔐 Logged-in user (email from SignIn.jsx)
+  // Logged-in user (email from SignIn.jsx)
   const currentUser = localStorage.getItem("currentUser");
 
   const [showModal, setShowModal] = useState(false);
@@ -151,7 +151,7 @@ export default function CreateAgentPage() {
         icon: selectedEmoji,
         color: selectedColor,
 
-        // ✅ THIS FIXES "owned agents"
+        // This fixes "owned agents"
         owner: currentUser,
 
         // optional metadata
@@ -164,7 +164,7 @@ export default function CreateAgentPage() {
       // Save agent
       const agentDocRef = await addDoc(collection(db, "agents"), agentData);
 
-      // ✅ If created from a group: add this agent to that group's aiAgents + set activeAgentId
+      // If created from a group: add this agent to that group's aiAgents + set activeAgentId
       if (pendingGroupId) {
         const groupRef = doc(db, "groupChats", pendingGroupId);
         const groupSnap = await getDoc(groupRef);

@@ -73,7 +73,7 @@ export default function InviteInbox() {
           <div className="invite-icon-wrap" aria-label="Invites">
             <FiMail size={18} />
 
-            {/* 🔴 notification badge */}
+            {/* Notification badge */}
             {inviteCount > 0 && (
               <span className="invite-badge" aria-label={`${inviteCount} invites`}>
                 {badgeText}

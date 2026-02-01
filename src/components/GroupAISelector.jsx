@@ -191,7 +191,7 @@ export default function GroupAISelector({ groupId, groupName, onDone }) {
               )}
             </div>
 
-            {/* ❌ ALWAYS just exit */}
+            {/* Always just exit */}
             <button
               className="close-group-btn"
               onClick={() => navigate("/home")}

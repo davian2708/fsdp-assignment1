@@ -327,7 +327,7 @@ export default function ChatInterface() {
     const convoRef = await addDoc(collection(db, "conversations"), {
       agentId,
       userId: "user",
-      title: firstMessage.slice(0, 40), // ✅ ChatGPT-style title
+      title: firstMessage.slice(0, 40), // ChatGPT-style title
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });
@@ -458,9 +458,9 @@ useEffect(() => {
         messageId,
         agentId,
         satisfied,
-        sessionId,                // ✅ keep for grouping sessions if you want
-        userEmail,                // ✅ IMPORTANT: lets homepage query per user
-        conversationId: conversationId || null, // ✅ optional, but safe
+        sessionId,                // Keep for grouping sessions if you want
+        userEmail,                // Important: lets homepage query per user
+        conversationId: conversationId || null, // Optional, but safe
         createdAt: serverTimestamp(),
       });
     };
