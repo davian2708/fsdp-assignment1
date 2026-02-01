@@ -22,7 +22,10 @@ export default function HelpPage() {
     try {
       const result = await routeHelpRequest(trimmed);
       if (!result?.agentId) throw new Error("No agentId returned");
-      navigate(`/agent-chat/${result.agentId}`);
+      navigate(`/agent-chat/${result.agentId}`, {
+      state: { initialPrompt: trimmed },
+    });
+
     } catch (err) {
       console.error(err);
       alert("Could not route your request. Please try again.");
@@ -53,14 +56,21 @@ export default function HelpPage() {
           </p>
 
           <form onSubmit={onSubmit} className="help-form">
-            <textarea
-              className="help-input"
-              placeholder="Type your question here..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              rows={4}
-              disabled={loading}
-            />
+          <textarea
+            className="help-input"
+            placeholder="Type your question here..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                onSubmit(e);
+              }
+            }}
+            rows={4}
+            disabled={loading}
+          />
+
 
             <div className="help-actions">
               <button

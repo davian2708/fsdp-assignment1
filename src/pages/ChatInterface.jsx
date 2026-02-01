@@ -11,7 +11,7 @@ import {
   FiThumbsUp,
   FiThumbsDown
 } from "react-icons/fi";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { orderBy } from "firebase/firestore";
@@ -73,8 +73,13 @@ function suggestAgentsFromMessage(message, agents, currentAgentId) {
 }
 
 export default function ChatInterface() {
+  
   const { agentId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialPrompt = location.state?.initialPrompt || "";
+  const autoSentRef = useRef(false);
+
 
   const [searchParams] = useSearchParams();
   const urlConversationId = searchParams.get("conversationId");
@@ -278,11 +283,11 @@ export default function ChatInterface() {
 
 
   // Send message to backend and get AI response
-const sendMessage = async () => {
-  if (!input.trim() && !selectedFile) return;
+const sendMessage = async (overrideText) => {
+  const textToSend = (overrideText ?? input).trim();
+  if (!textToSend && !selectedFile) return;
 
-  // DEFINE FIRST
-  const userMessage = input;
+  const userMessage = textToSend;
   setInput("");
 
   // CREATE CONVERSATION IF NEEDED
@@ -378,6 +383,16 @@ const sendMessage = async () => {
   }
 };
 
+useEffect(() => {
+  // Wait until agent is loaded and only auto-send once
+  if (loading) return;
+  if (!initialPrompt) return;
+  if (autoSentRef.current) return;
+
+  autoSentRef.current = true;
+  sendMessage(initialPrompt);
+
+}, [loading, initialPrompt]);
 
 
     const submitFeedback = async (messageId, satisfied) => {

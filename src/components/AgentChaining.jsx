@@ -12,6 +12,10 @@ export default function AgentChaining({ primaryAgentId, onChainSelected }) {
   // const [loading, setLoading] = useState(false);
   // const [showChainChat, setShowChainChat] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState(null);
+  const [chainInput, setChainInput] = useState("");
+  const [chainMessages, setChainMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+
 
 
   useEffect(() => {
