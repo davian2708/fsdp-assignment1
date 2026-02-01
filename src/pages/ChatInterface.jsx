@@ -76,6 +76,7 @@ export default function ChatInterface() {
   
   const { agentId } = useParams();
   const navigate = useNavigate();
+  const currentUser = localStorage.getItem("currentUser"); // email
   const location = useLocation();
   const initialPrompt = location.state?.initialPrompt || "";
   const autoSentRef = useRef(false);
@@ -396,24 +397,32 @@ useEffect(() => {
 
 
     const submitFeedback = async (messageId, satisfied) => {
-    await addDoc(collection(db, "feedback"), {
-      messageId,
-      agentId,
-      conversationId,
-      satisfied,
-      createdAt: serverTimestamp(),
-    });
-  };
+      const userEmail = localStorage.getItem("currentUser") || "unknown";
+
+      await addDoc(collection(db, "feedback"), {
+        messageId,
+        agentId,
+        satisfied,
+        sessionId,                // ✅ keep for grouping sessions if you want
+        userEmail,                // ✅ IMPORTANT: lets homepage query per user
+        conversationId: conversationId || null, // ✅ optional, but safe
+        createdAt: serverTimestamp(),
+      });
+    };
 
   const hasFeedback = async (messageId) => {
+    const userEmail = localStorage.getItem("currentUser") || "unknown";
+
     const q = query(
       collection(db, "feedback"),
       where("messageId", "==", messageId),
-      where("conversationId", "==", conversationId)
+      where("userEmail", "==", userEmail)
     );
+
     const snap = await getDocs(q);
     return !snap.empty;
   };
+
 
   if (loading) return <div>Loading agent...</div>;
   if (!agent) return <div>Agent not found.</div>;

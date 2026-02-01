@@ -1,3 +1,5 @@
+// src/pages/HomePage.jsx
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -27,7 +29,7 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   // 🔐 Logged-in user
-  const currentUser = localStorage.getItem("currentUser");
+  const currentUser = localStorage.getItem("currentUser"); // email
 
   // 📬 Mailbox toggle
   const [showInbox, setShowInbox] = useState(false);
@@ -66,7 +68,7 @@ export default function HomePage() {
     const unsub = onSnapshot(
       qInvites,
       (snap) => {
-        setInviteCount(snap.size); // number of pending invites
+        setInviteCount(snap.size);
       },
       (err) => {
         console.error("Invite count listener error:", err);
@@ -81,48 +83,58 @@ export default function HomePage() {
     if (!currentUser) return;
 
     const fetchStats = async () => {
-      // Fetch all agents
-      const agentsSnap = await getDocs(collection(db, "agents"));
+      try {
+        // ===== Agents (user-scoped) =====
+        const agentsSnap = await getDocs(collection(db, "agents"));
 
-      // ✅ Filter by owner
-      const userAgents = agentsSnap.docs
-        .map((doc) => doc.data())
-        .filter((agent) => agent.owner === currentUser);
+        const userAgents = agentsSnap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .filter((agent) => agent.owner === currentUser);
 
-      const totalAgents = userAgents.length;
+        const totalAgents = userAgents.length;
 
-      // Active agents in last 7 days
-      const sevenDaysAgo = Timestamp.fromDate(
-        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-      );
+        // Active agents in last 7 days
+        const sevenDaysAgo = Timestamp.fromDate(
+          new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+        );
 
-      const activeAgents = userAgents.filter((agent) => {
-        if (!agent.lastUsedAt) return false;
-        return agent.lastUsedAt.toDate() >= sevenDaysAgo.toDate();
-      }).length;
+        const activeAgents = userAgents.filter((agent) => {
+          if (!agent.lastUsedAt) return false;
+          return agent.lastUsedAt.toDate() >= sevenDaysAgo.toDate();
+        }).length;
 
-      setAgentActivity({
-        active: activeAgents,
-        inactive: totalAgents - activeAgents,
-      });
+        setAgentActivity({
+          active: activeAgents,
+          inactive: totalAgents - activeAgents,
+        });
 
-      // User satisfaction
-      const feedbackSnap = await getDocs(collection(db, "feedback"));
-      const userFeedback = feedbackSnap.docs
-        .map((doc) => doc.data())
-        .filter((f) => f.owner === currentUser);
+        // ===== Feedback satisfaction (userEmail-scoped) =====
+        // IMPORTANT: This requires each feedback doc to include `userEmail`.
+        // (Add it when writing feedback from ChatInterface)
+        const feedbackQ = query(
+          collection(db, "feedback"),
+          where("userEmail", "==", currentUser)
+        );
 
-      const totalFeedback = userFeedback.length;
-      const positive = userFeedback.filter((f) => f.satisfied === true).length;
+        const feedbackSnap = await getDocs(feedbackQ);
+        const userFeedback = feedbackSnap.docs.map((d) => d.data());
 
-      const userSatisfaction =
-        totalFeedback === 0 ? 0 : Math.round((positive / totalFeedback) * 100);
+        const totalFeedback = userFeedback.length;
+        const positive = userFeedback.filter((f) => f.satisfied === true).length;
 
-      setStats({
-        totalAgents,
-        activeAgents,
-        userSatisfaction,
-      });
+        const userSatisfaction =
+          totalFeedback === 0 ? 0 : Math.round((positive / totalFeedback) * 100);
+
+        setStats({
+          totalAgents,
+          activeAgents,
+          userSatisfaction,
+        });
+      } catch (err) {
+        console.error("Failed to fetch homepage stats:", err);
+        // keep UI stable if something fails
+        setStats((prev) => ({ ...prev, userSatisfaction: prev.userSatisfaction ?? 0 }));
+      }
     };
 
     fetchStats();
@@ -154,7 +166,7 @@ export default function HomePage() {
               className="mailbox-btn"
               onClick={() => setShowInbox((prev) => !prev)}
               title="Group Invites"
-              style={{ position: "relative" }} // ✅ allow badge overlay
+              style={{ position: "relative" }}
             >
               <FiMail size={22} />
 
