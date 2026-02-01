@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FiSettings, FiX } from "react-icons/fi";
 import Sidebar from "../components/SideBar";
+import TutorialOverlay from "../components/TutorialOverlay";
 import { useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import { HexColorPicker } from "react-colorful";
@@ -46,6 +47,67 @@ export default function CreateAgentPage() {
   }, [currentUser, navigate]);
 
   const handleLogoClick = () => navigate("/home");
+
+  const tutorialSteps = useMemo(
+    () => [
+      {
+        selector: '[data-tutorial="create-header"]',
+        title: "Create Agent header",
+        content:
+          "Use the logo to go back Home. The settings button opens app preferences.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="create-logo"]',
+        title: "Logo shortcut",
+        content: "Click the logo to return to the Home screen.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="create-identity"]',
+        title: "Agent identity",
+        content:
+          "Give your agent a clear name and choose an icon so you can recognize it later.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="create-summary"]',
+        title: "Quick summary",
+        content:
+          "Write a short one-line summary of what this agent helps with.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="create-specialties"]',
+        title: "Specialties",
+        content:
+          "Add keywords like Finance or Travel so the system can match this agent to users.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="create-guidelines"]',
+        title: "Behavior guidelines",
+        content:
+          "Explain how the agent should behave and respond. This keeps answers consistent.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="create-tools"]',
+        title: "Tools",
+        content:
+          "Choose any tools the agent is allowed to use (optional).",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="create-submit"]',
+        title: "Create agent",
+        content:
+          "Click Create Agent to save it and start chatting right away.",
+        placement: "top",
+      },
+    ],
+    []
+  );
 
   const handleAddSpecialty = () => {
     const clean = newSpecialty.trim();
@@ -145,8 +207,12 @@ export default function CreateAgentPage() {
 
       <div className="main">
         {/* Header */}
-        <div className="dashboard-header">
-          <div className="logo-container" onClick={handleLogoClick}>
+        <div className="dashboard-header" data-tutorial="create-header">
+          <div
+            className="logo-container"
+            onClick={handleLogoClick}
+            data-tutorial="create-logo"
+          >
             <img src={logo} alt="Logo" className="logo" />
           </div>
 
@@ -160,7 +226,7 @@ export default function CreateAgentPage() {
           <h2>Make your own Agent</h2>
 
           <label>Create your agent’s identity: Add a name and icon.</label>
-          <div className="row">
+          <div className="row" data-tutorial="create-identity">
             <input
               type="text"
               placeholder="Agent Name"
@@ -178,19 +244,19 @@ export default function CreateAgentPage() {
           </div>
 
           <label>Write a quick summary of your agent’s function.</label>
-          <div className="input-with-counter">
+          <div className="input-with-counter" data-tutorial="create-summary">
             <input
               type="text"
-              maxLength="30"
+              maxLength="100"
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               placeholder="Enter agent summary..."
             />
-            <span className="char-counter">{summary.length}/30</span>
+            <span className="char-counter">{summary.length}/100</span>
           </div>
 
           <label>Configure your agent’s behavior and preferences.</label>
-          <div className="specialize-row">
+          <div className="specialize-row" data-tutorial="create-specialties">
             <p>This agent specializes in</p>
 
             {!showInput ? (
@@ -222,7 +288,10 @@ export default function CreateAgentPage() {
           </div>
 
           <label>Define your agent’s role, personality, and behavior guidelines.</label>
-          <div className="input-with-counter textarea-wrapper">
+          <div
+            className="input-with-counter textarea-wrapper"
+            data-tutorial="create-guidelines"
+          >
             <textarea
               maxLength="500"
               value={guidelines}
@@ -233,14 +302,23 @@ export default function CreateAgentPage() {
           </div>
 
           <label>Assign tools that your agent can access.</label>
-          <select value={selectedTool} onChange={(e) => setSelectedTool(e.target.value)}>
+          <select
+            value={selectedTool}
+            onChange={(e) => setSelectedTool(e.target.value)}
+            data-tutorial="create-tools"
+          >
             <option value="">Select tool...</option>
             <option value="Database">Database</option>
             <option value="Chat Interface">Chat Interface</option>
             <option value="Web Scraper">Web Scraper</option>
           </select>
 
-          <button className="create-btn" onClick={handleCreateAgent} type="button">
+          <button
+            className="create-btn"
+            onClick={handleCreateAgent}
+            type="button"
+            data-tutorial="create-submit"
+          >
             Create Agent
           </button>
         </div>
@@ -271,6 +349,7 @@ export default function CreateAgentPage() {
           </div>
         )}
       </div>
+      <TutorialOverlay steps={tutorialSteps} tutorialKey="create-agent" />
     </div>
   );
 }

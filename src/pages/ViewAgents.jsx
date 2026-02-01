@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Sidebar from "../components/SideBar";
+import TutorialOverlay from "../components/TutorialOverlay";
 import "../styles/viewagents.css";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/Flying Bot Logo.png";
@@ -119,16 +120,91 @@ export default function ViewAgents() {
   const activeAgents = filteredAgents.filter((a) => a.isActive !== false);
   const disabledAgents = filteredAgents.filter((a) => a.isActive === false);
 
+  const tutorialSteps = useMemo(
+    () => [
+      {
+        selector: '[data-tutorial="view-logo"]',
+        title: "Logo shortcut",
+        content:
+          "Click the Flying Bot logo to go back to the Home screen.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="view-title"]',
+        title: "Your agents list",
+        content:
+          "This page shows every agent you have created.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="view-search"]',
+        title: "Search agents",
+        content:
+          "Type a name to find an agent quickly.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="view-filters"]',
+        title: "Filter categories",
+        content:
+          "Use these buttons to show only the type of agent you want.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="view-active-grid"]',
+        title: "Active agents",
+        content:
+          "These agents are ready to use. Click one to open its chat.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="view-status"]',
+        title: "Active/Disabled toggle",
+        content:
+          "Click this badge to turn an agent on or off.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="view-settings"]',
+        title: "Agent settings",
+        content:
+          "Use the settings icon to change details about the agent.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="view-disabled-section"]',
+        title: "Disabled agents",
+        content:
+          "Agents you turned off appear here. You can remove them if you don’t need them.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="view-delete"]',
+        title: "Delete agent",
+        content:
+          "The trash icon deletes a disabled agent forever. This cannot be undone.",
+        placement: "top",
+      },
+    ],
+    []
+  );
+
   return (
     <div className="view-layout">
       <Sidebar />
 
       <div className="view-panel">
-        <div className="view-logo" onClick={handleLogoClick}>
+        <div
+          className="view-logo"
+          onClick={handleLogoClick}
+          data-tutorial="view-logo"
+        >
           <img src={logo} alt="Logo" className="logo" />
         </div>
 
-        <h1 className="view-title">Your AI Agents</h1>
+        <h1 className="view-title" data-tutorial="view-title">
+          Your AI Agents
+        </h1>
 
         <input
           type="text"
@@ -136,9 +212,10 @@ export default function ViewAgents() {
           className="view-search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          data-tutorial="view-search"
         />
 
-        <div className="view-filters">
+        <div className="view-filters" data-tutorial="view-filters">
           {["All", "Created", "Saved", "Education", "Creativity"].map((cat) => (
             <button
               key={cat}
@@ -151,7 +228,7 @@ export default function ViewAgents() {
         </div>
 
         {/* ACTIVE AGENTS */}
-        <div className="agents-grid">
+        <div className="agents-grid" data-tutorial="view-active-grid">
           {activeAgents.map((agent) => (
             <AgentCard
               key={agent.id}
@@ -167,7 +244,10 @@ export default function ViewAgents() {
         {disabledAgents.length > 0 && (
           <>
             <h2 className="disabled-title">Disabled Agents</h2>
-            <div className="agents-grid disabled-section">
+            <div
+              className="agents-grid disabled-section"
+              data-tutorial="view-disabled-section"
+            >
               {disabledAgents.map((agent) => (
                 <AgentCard
                   key={agent.id}
@@ -181,6 +261,8 @@ export default function ViewAgents() {
           </>
         )}
       </div>
+
+      <TutorialOverlay steps={tutorialSteps} tutorialKey="view-agents" />
     </div>
   );
 }
@@ -215,6 +297,7 @@ function AgentCard({ agent, onToggle, onDelete, navigate }) {
           e.stopPropagation();
           onToggle(agent.id, agent.isActive);
         }}
+        data-tutorial="view-status"
       >
         {isActive ? "Active" : "Disabled"}
       </span>
@@ -227,10 +310,15 @@ function AgentCard({ agent, onToggle, onDelete, navigate }) {
             e.stopPropagation();
             onDelete(agent.id);
           }}
+          data-tutorial="view-delete"
         />
       )}
 
-      <FiSettings className="agent-settings" onClick={(e) => e.stopPropagation()} />
+      <FiSettings
+        className="agent-settings"
+        onClick={(e) => e.stopPropagation()}
+        data-tutorial="view-settings"
+      />
     </div>
   );
 }

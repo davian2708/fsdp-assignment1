@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Sidebar from "../components/SideBar";
 import KnowledgeBase from "../components/KnowledgeBase";
 import AgentChaining from "../components/AgentChaining";
+import TutorialOverlay from "../components/TutorialOverlay";
 import "../styles/chatinterface.css";
 import {
   FiArrowLeft,
@@ -107,6 +108,60 @@ export default function ChatInterface() {
   const [secondaryAgent, setSecondaryAgent] = useState(null);
 
   const [showAllConfidence, setShowAllConfidence] = useState(false);
+
+  const tutorialSteps = useMemo(
+    () => [
+      {
+        selector: '[data-tutorial="chat-header"]',
+        title: "Agent header",
+        content:
+          "This area shows who you are chatting with. The buttons on the right open tools for this agent.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="chat-kb"]',
+        title: "Knowledge Base",
+        content:
+          "Click KB to add files or links for the agent to read. It will use them to answer you better.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="chat-chain"]',
+        title: "Agent chaining",
+        content:
+          "Turn this on to let two agents work together on one answer.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="chat-messages"]',
+        title: "Chat history",
+        content:
+          "Your conversation appears here. Scroll up to read earlier messages.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="chat-upload"]',
+        title: "Attach a file",
+        content:
+          "Add a photo or document to send with your next message.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="chat-input"]',
+        title: "Write a prompt",
+        content:
+          "Type your message here. Press Enter to send.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="chat-send"]',
+        title: "Send",
+        content: "Click Send to deliver your message. The agent will respond below.",
+        placement: "top",
+      },
+    ],
+    []
+  );
 
   const filteredSuggestions = agentSuggestions.filter(
   (s) => !secondaryAgent || s.agentId !== secondaryAgent.id
@@ -433,8 +488,12 @@ useEffect(() => {
 
       <div className="chat-panel">
         {/* === AGENT HEADER === */}
-        <div className="agent-header">
-          <button className="back-btn" onClick={() => navigate("/view-agents")}>
+        <div className="agent-header" data-tutorial="chat-header">
+          <button
+            className="back-btn"
+            onClick={() => navigate("/view-agents")}
+            data-tutorial="chat-back"
+          >
             <FiArrowLeft size={20} />
           </button>
 
@@ -457,6 +516,7 @@ useEffect(() => {
               className="edit-btn"
               onClick={() => alert("Edit feature coming soon!")}
               title="Edit agent"
+              data-tutorial="chat-edit"
             >
               <FiEdit2 size={18} /> Edit
             </button>
@@ -464,17 +524,20 @@ useEffect(() => {
               className="kb-btn"
               onClick={() => setShowKB(!showKB)}
               title="Manage Knowledge Base"
+              data-tutorial="chat-kb"
             >
               📚 KB
             </button>
             {/* <AgentChaining primaryAgentId={agentId} /> */}
-            <AgentChaining
-              primaryAgentId={agentId}
-              onChainSelected={({ enabled, secondaryAgent }) => {
-                setChainMode(enabled);
-                setSecondaryAgent(secondaryAgent);
-              }}
-            />
+            <div data-tutorial="chat-chain">
+              <AgentChaining
+                primaryAgentId={agentId}
+                onChainSelected={({ enabled, secondaryAgent }) => {
+                  setChainMode(enabled);
+                  setSecondaryAgent(secondaryAgent);
+                }}
+              />
+            </div>
             <button className="chat-btn">
               <FiSend size={18} /> Chat
             </button>
@@ -485,7 +548,7 @@ useEffect(() => {
         {showKB && <KnowledgeBase agentId={agentId} />}
 
         {/* === CHAT MESSAGES === */}
-        <div className="messages-container">
+        <div className="messages-container" data-tutorial="chat-messages">
 
           {/* GREETING / EMPTY STATE */}
           {!conversationId && messages.length === 0 && (
@@ -630,9 +693,9 @@ useEffect(() => {
           </div>
         )}
 
-          <div className="input-box">
+          <div className="input-box" data-tutorial="chat-input">
             {/*  File upload */}
-            <label className="input-icon upload-icon">
+            <label className="input-icon upload-icon" data-tutorial="chat-upload">
               <FiUpload size={20} />
               <input
                 type="file"
@@ -682,12 +745,14 @@ useEffect(() => {
             />
 
             {/* Send button */}
-            <button className="send-btn" onClick={sendMessage}>
+            <button className="send-btn" onClick={sendMessage} data-tutorial="chat-send">
               <FiSend size={18} />
             </button>
           </div>
         </div>
       </div>
+
+      <TutorialOverlay steps={tutorialSteps} tutorialKey="chat" />
     </div>
   );
 }

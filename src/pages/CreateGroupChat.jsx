@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/SideBar";
+import TutorialOverlay from "../components/TutorialOverlay";
+import logo from "../assets/Flying Bot Logo.png";
 import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import "../styles/createagent.css";
@@ -12,6 +14,55 @@ export default function CreateGroupChat() {
   const [groupName, setGroupName] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [members, setMembers] = useState([]);
+
+  const handleLogoClick = () => navigate("/home");
+
+  const tutorialSteps = useMemo(
+    () => [
+      {
+        selector: '[data-tutorial="group-title"]',
+        title: "Create a group chat",
+        content:
+          "Start a shared chat with multiple people here.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="group-logo"]',
+        title: "Logo shortcut",
+        content: "Click the logo to return to the Home screen.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="group-name"]',
+        title: "Group name",
+        content:
+          "Give your group a clear name so members recognize it easily.",
+        placement: "bottom",
+      },
+      {
+        selector: '[data-tutorial="group-members"]',
+        title: "Add members",
+        content:
+          "Type an email address and click Add. Repeat for each person you want to invite.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="group-tags"]',
+        title: "Member list",
+        content:
+          "All invited emails appear here. Remove any name before creating the group.",
+        placement: "top",
+      },
+      {
+        selector: '[data-tutorial="group-submit"]',
+        title: "Create group",
+        content:
+          "Click Create Group Chat to save the group and return Home.",
+        placement: "top",
+      },
+    ],
+    []
+  );
 
   const handleAddMember = () => {
     const email = emailInput.trim();
@@ -51,17 +102,33 @@ export default function CreateGroupChat() {
     <div className="create-agent-page">
       <Sidebar />
       <div className="main">
+        <div className="dashboard-header" data-tutorial="group-header">
+          <div
+            className="logo-container"
+            onClick={handleLogoClick}
+            role="button"
+            tabIndex={0}
+            data-tutorial="group-logo"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogoClick();
+            }}
+          >
+            <img src={logo} alt="Logo" className="logo" />
+          </div>
+        </div>
+
         <div className="form-container">
-          <h2>Create Group Chat</h2>
+          <h2 data-tutorial="group-title">Create Group Chat</h2>
 
           <label>Group Name</label>
           <input
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
+            data-tutorial="group-name"
           />
 
           <label>Add Members (by email)</label>
-          <div className="row">
+          <div className="row" data-tutorial="group-members">
             <input
               type="email"
               value={emailInput}
@@ -70,7 +137,7 @@ export default function CreateGroupChat() {
             <button className="add-btn" onClick={handleAddMember}>Add</button>
           </div>
 
-          <div className="tag-container">
+          <div className="tag-container" data-tutorial="group-tags">
             {members.map((email, i) => (
               <div key={i} className="tag">
                 <span>{email}</span>
@@ -79,11 +146,17 @@ export default function CreateGroupChat() {
             ))}
           </div>
 
-          <button className="create-btn" onClick={handleCreateGroup}>
+          <button
+            className="create-btn"
+            onClick={handleCreateGroup}
+            data-tutorial="group-submit"
+          >
             Create Group Chat
           </button>
         </div>
       </div>
+
+      <TutorialOverlay steps={tutorialSteps} tutorialKey="create-group" />
     </div>
   );
 }

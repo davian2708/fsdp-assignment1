@@ -5,14 +5,36 @@
 
 .help-panel{
   flex:1;
-  padding: 28px;
+  padding: 40px 60px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  box-sizing:border-box;
 }
 
 .help-header{
   display:flex;
-  justify-content:space-between;
+  justify-content:center;
   align-items:center;
-  margin-bottom: 24px;
+  margin-bottom: 30px;
+  width:100%;
+  position: relative;
+}
+
+.help-header .logo-container{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 30px;
+}
+
+.help-header .settings-btn{
+  position: absolute;
+  right: 0;
+}
+
+.help-header .logo-container:hover{
+  opacity: 0.9;
 }
 
 .help-card{
@@ -23,6 +45,7 @@
   border-radius: 14px;
   padding: 24px;
   box-shadow: 0 10px 30px var(--shadow-color);
+  width: 100%;
 }
 
 .help-title{
@@ -52,6 +75,7 @@
   background: var(--bg-input);
   color: var(--text-primary);
   font-size: 14px;
+  min-height: 120px;
 }
 
 .help-input:focus{
@@ -73,6 +97,7 @@
   color: white;
   cursor:pointer;
 }
+
 
 .help-secondary{
   border: 1px solid var(--border-color);
