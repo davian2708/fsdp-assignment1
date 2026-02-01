@@ -96,6 +96,36 @@ def query_agent_openai_chain(agent: dict, user_message: str) -> str:
         raise HTTPException(status_code=500, detail=f"OpenAI error: {str(e)}")
 
 
+def build_chain_confidence(user_message: str, primary_response: str, secondary_response: str) -> dict:
+    score = 70
+    reasons = ["Chained response from multiple agents"]
+
+    user_len = len((user_message or "").strip())
+    primary_len = len((primary_response or "").strip())
+    secondary_len = len((secondary_response or "").strip())
+
+    if user_len < 10:
+        score -= 20
+        reasons.append("Insufficient input detail")
+
+    if primary_len < 40 or secondary_len < 40:
+        score -= 15
+        reasons.append("Limited detail from one or more agents")
+
+    if score >= 60:
+        level = "high"
+    elif score >= 30:
+        level = "medium"
+    else:
+        level = "low"
+
+    return {
+        "score": max(0, min(score, 100)),
+        "level": level,
+        "reasons": reasons,
+    }
+
+
 @router.post("/link")
 async def create_agent_link(req: AgentLinkRequest):
     print("LINK REQUEST RECEIVED")
@@ -232,8 +262,15 @@ Original user query: {req.user_message}
             temperature=0.6,
         ).choices[0].message.content
 
+        confidence = build_chain_confidence(
+            req.user_message,
+            primary_response,
+            secondary_response,
+        )
+
         return {
-            "reply": final_response
+            "reply": final_response,
+            "confidence": confidence
         }
 
     except Exception as e:

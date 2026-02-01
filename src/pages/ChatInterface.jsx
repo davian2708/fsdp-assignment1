@@ -340,7 +340,7 @@ export default function ChatInterface() {
 
   // Send message to backend and get AI response
 const sendMessage = async (overrideText) => {
-  const textToSend = (overrideText ?? input).trim();
+  const textToSend = String(overrideText ?? input ?? "").trim();
   if (!textToSend && !selectedFile) return;
 
   const userMessage = textToSend;
@@ -408,14 +408,19 @@ const sendMessage = async (overrideText) => {
     const aiText = res.reply;
     const aiConfidence = res.confidence;
 
-    const aiDocRef = await addDoc(collection(db, "messages"), {
+    const aiMessage = {
       conversationId: activeConversationId,
       agentId,
       sender: "assistant",
       text: aiText,
-      confidence: aiConfidence,
       createdAt: serverTimestamp(),
-    });
+    };
+
+    if (aiConfidence !== undefined && aiConfidence !== null) {
+      aiMessage.confidence = aiConfidence;
+    }
+
+    const aiDocRef = await addDoc(collection(db, "messages"), aiMessage);
 
     await updateDoc(doc(db, "conversations", activeConversationId), {
       updatedAt: serverTimestamp(),
@@ -427,7 +432,7 @@ const sendMessage = async (overrideText) => {
         id: aiDocRef.id,
         sender: "bot",
         text: aiText,
-        confidence: aiConfidence,
+        confidence: aiConfidence ?? null,
       },
     ]);
   } catch (err) {
