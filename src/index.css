@@ -138,3 +138,14 @@ input {
     animation: none !important;
   }
 }
+:root {
+  /* ...your existing tokens... */
+  --bg-hover: rgba(255, 255, 255, 0.08);
+  --bg-active: rgba(255, 255, 255, 0.12);
+}
+
+body.light-mode {
+  /* ...your existing tokens... */
+  --bg-hover: rgba(0, 0, 0, 0.06);
+  --bg-active: rgba(0, 0, 0, 0.10);
+}

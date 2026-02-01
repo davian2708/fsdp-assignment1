@@ -1,152 +1,150 @@
-/* =====================================================
-   SIDEBAR BASE
-===================================================== */
+/* === SIDEBAR BASE === */
+
 .sidebar {
-  width: 260px;
+  width: 250px;
   height: 100vh;
-  background: var(--bg-secondary);
+  background: var(--bg-secondary, #111827);
   display: flex;
   flex-direction: column;
-  padding: 20px 18px;
+  padding: 24px 20px;
+  color: var(--text-primary, #e5e7eb);
   box-sizing: border-box;
-  border-right: 1px solid var(--border-color);
-  color: var(--text-primary);
+  border-right: 1px solid var(--border-color, rgba(255,255,255,0.12));
 }
 
-/* =====================================================
-   USER PROFILE
-===================================================== */
+/* === USER SECTION === */
+
 .user-profile {
-  position: relative;
+  position: relative; /* anchors dropdown to the user block */
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 28px;
 }
 
 .user-icon {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: var(--bg-input);
+  background: var(--bg-input, rgba(255,255,255,0.08));
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-right: 12px;
 }
 
 .user-profile p {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   margin: 0;
-  word-break: break-all;
+  color: var(--text-primary, #e5e7eb);
 }
 
-/* =====================================================
-   USER DROPDOWN
-===================================================== */
-.user-dropdown {
-  position: absolute;
-  top: 44px;
-  left: 52px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 6px;
-  min-width: 120px;
-  box-shadow: 0 8px 20px var(--shadow-color);
-  z-index: 100;
-}
-
-.user-dropdown-item {
-  width: 100%;
-  padding: 8px 10px;
-  font-size: 13px;
-  border-radius: 8px;
+/* Optional: if you're using a button for the email */
+.user-email-btn {
   background: transparent;
   border: none;
-  text-align: left;
+  padding: 0;
   cursor: pointer;
-  color: var(--text-primary);
+  text-align: left;
+  color: inherit;
 }
 
-.user-dropdown-item:hover {
-  background: var(--btn-bg-hover);
-}
+/* === CREATE BUTTON === */
 
-.user-dropdown-item.danger {
-  color: #ef4444;
-}
-
-/* =====================================================
-   CREATE BUTTONS (PRIMARY ACTIONS)
-===================================================== */
 .create-agent-btn {
-  width: 100%;
-  background: var(--action-btn);
-  color: #ffffff;
+  background: #3b82f6;
+  color: white;
   font-weight: 600;
   border: none;
-  border-radius: 16px;
-  padding: 14px;
+  border-radius: 10px;
+  padding: 12px;
+  width: 100%;
   cursor: pointer;
-  margin-bottom: 10px;
-  transition: background 0.2s ease, transform 0.1s ease;
+  margin-bottom: 12px;
+  transition: background 0.2s ease;
 }
 
 .create-agent-btn:hover {
   background: #2563eb;
-  transform: translateY(-1px);
 }
 
-/* =====================================================
-   MAIN MENU (NAVIGATION)
-===================================================== */
+/* === MENU === */
+
 .menu {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 12px;
 }
 
-.menu-btn {
+.menu.bottom {
+  margin-top: auto;
+}
+
+/* ==========================================================
+   🔥 BEST FIX: SCOPE BUTTON STYLES TO SIDEBAR ONLY
+   Prevents collisions with other files like groupAiSelector.css
+   ========================================================== */
+
+.sidebar .menu-btn {
   width: 100%;
-  background: var(--bg-input);
-  color: var(--text-primary);   
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 14px;
+  background: var(--btn-bg, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--btn-border, rgba(255, 255, 255, 0.14));
+  border-radius: 10px;
+  padding: 10px;
+
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+
+  color: var(--text-primary, #e5e7eb); /* force visible text */
   cursor: pointer;
-  text-align: center;
-  transition: background 0.15s ease, transform 0.1s ease;
+
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
 }
 
-.menu-btn:hover {
-  background: var(--btn-bg-hover);
-  transform: translateY(-1px);
+.sidebar .menu-btn:hover {
+  background: var(--btn-bg-hover, rgba(255, 255, 255, 0.12));
 }
 
-/* Dark mode sidebar nav tweak */
-:root .sidebar .menu-btn {
-  background: var(--btn-bg);
+.sidebar .menu-btn:active {
+  transform: scale(0.99);
 }
 
-/* =====================================================
-   CHAT HISTORY
-===================================================== */
+/* ✅ LIGHT MODE OVERRIDES (only within sidebar) */
+body.light-mode .sidebar {
+  background: var(--bg-secondary, #f3f4f6);
+  color: var(--text-primary, #111827);
+  border-right: 1px solid var(--border-color, #e5e7eb);
+}
+
+body.light-mode .sidebar .menu-btn {
+  background: var(--btn-bg, #f1f2f4);
+  border: 1px solid var(--btn-border, #d6d9de);
+  color: var(--text-primary, #111827);
+}
+
+body.light-mode .sidebar .menu-btn:hover {
+  background: var(--btn-bg-hover, #e6e8ec);
+}
+
+/* === CHAT HISTORY === */
+
 .chat-history {
-  margin-top: 16px;
-  flex: 1;
+  margin-top: 24px;
+  max-height: 60vh;
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: 6px;
+  scroll-behavior: smooth;
 }
 
 .history-title {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--text-secondary, rgba(255,255,255,0.7));
+  margin-bottom: 8px;
   padding-left: 4px;
+}
+
+body.light-mode .history-title {
+  color: var(--text-secondary, #6b7280);
 }
 
 .history-item {
@@ -154,18 +152,31 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
+  color: var(--text-primary, #e5e7eb);
   transition: background 0.15s ease;
 }
 
+body.light-mode .history-item {
+  color: var(--text-primary, #111827);
+}
+
 .history-item:hover {
-  background: var(--btn-bg-hover);
+  background: var(--bg-hover, rgba(255,255,255,0.10));
+}
+
+body.light-mode .history-item:hover {
+  background: var(--bg-hover, #f3f4f6);
 }
 
 .history-item.active {
-  background: var(--btn-bg);
+  background: var(--bg-active, rgba(255,255,255,0.14));
+}
+
+body.light-mode .history-item.active {
+  background: var(--bg-active, #e5e7eb);
 }
 
 .history-text {
@@ -174,18 +185,138 @@
   white-space: nowrap;
 }
 
-/* =====================================================
-   BOTTOM MENU (THEME SWITCH)
-===================================================== */
-.menu.bottom {
-  margin-top: auto;
-  padding-top: 14px;
-  border-top: 1px solid var(--border-color);
+.history-more {
+  position: relative;
+  cursor: pointer;
+  opacity: 0;
 }
 
-/* =====================================================
-   MOBILE
-===================================================== */
+.history-item:hover .history-more {
+  opacity: 1;
+}
+
+.history-dropdown {
+  position: absolute;
+  right: 0;
+  top: 22px;
+  background: var(--bg-secondary, #111827);
+  border: 1px solid var(--border-color, rgba(255,255,255,0.14));
+  border-radius: 8px;
+  min-width: 120px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  z-index: 999;
+  overflow: hidden;
+}
+
+body.light-mode .history-dropdown {
+  background: var(--bg-secondary, #ffffff);
+  border-color: var(--border-color, #e5e7eb);
+}
+
+.history-dropdown button {
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: var(--text-primary, #e5e7eb);
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+body.light-mode .history-dropdown button {
+  color: var(--text-primary, #111827);
+}
+
+.history-dropdown button:hover {
+  background: var(--bg-hover, rgba(255,255,255,0.10));
+}
+
+body.light-mode .history-dropdown button:hover {
+  background: var(--bg-hover, #f3f4f6);
+}
+
+.history-dropdown .danger {
+  color: #ef4444;
+}
+
+/* Scrollbar */
+.chat-history::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-history::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-history::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.chat-history::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+body.light-mode .chat-history::-webkit-scrollbar-thumb {
+  background-color: rgba(17, 24, 39, 0.2);
+}
+
+body.light-mode .chat-history::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(17, 24, 39, 0.35);
+}
+
+/* === LOGOUT DROPDOWN (COMPACT) === */
+
+.user-dropdown {
+  position: absolute;
+  top: 46px;
+  left: 52px;
+  width: auto;
+  min-width: 110px;
+  background: var(--bg-secondary, #111827);
+  border: 1px solid var(--border-color, rgba(255,255,255,0.14));
+  border-radius: 8px;
+  padding: 4px;
+  z-index: 60;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+body.light-mode .user-dropdown {
+  background: var(--bg-secondary, #ffffff);
+  border-color: var(--border-color, #e5e7eb);
+}
+
+.user-dropdown-item {
+  width: 100%;
+  padding: 6px 10px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+  border-radius: 6px;
+  color: var(--text-primary, #e5e7eb);
+}
+
+body.light-mode .user-dropdown-item {
+  color: var(--text-primary, #111827);
+}
+
+.user-dropdown-item:hover {
+  background: var(--bg-hover, rgba(255,255,255,0.10));
+}
+
+body.light-mode .user-dropdown-item:hover {
+  background: var(--bg-hover, #f3f4f6);
+}
+
+.user-dropdown-item.danger {
+  color: #d11a2a;
+}
+
+/* === MOBILE === */
+
 .mobile-topbar {
   display: none;
 }
@@ -193,7 +324,7 @@
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.4);
   z-index: 150;
 }
 
@@ -207,15 +338,27 @@
     align-items: center;
     height: 56px;
     padding: 0 16px;
-    background: var(--bg-primary);
-    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-primary, #0b1220);
+    border-bottom: 1px solid var(--border-color, rgba(255,255,255,0.12));
+  }
+
+  body.light-mode .mobile-topbar {
+    background: var(--bg-primary, #f9fafb);
+    border-bottom-color: var(--border-color, #e5e7eb);
   }
 
   .mobile-menu-btn {
-    background: var(--bg-input);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
+    background: var(--bg-input, rgba(255,255,255,0.08));
+    border: 1px solid var(--border-color, rgba(255,255,255,0.14));
+    border-radius: 8px;
     padding: 8px;
+    color: var(--text-primary, #e5e7eb);
+  }
+
+  body.light-mode .mobile-menu-btn {
+    background: var(--bg-input, #ffffff);
+    border-color: var(--border-color, #e5e7eb);
+    color: var(--text-primary, #111827);
   }
 
   .sidebar {
@@ -237,5 +380,16 @@
     background: none;
     border: none;
     margin-bottom: 12px;
+    color: var(--text-primary, #e5e7eb);
+  }
+
+  body.light-mode .sidebar-close-btn {
+    color: var(--text-primary, #111827);
+  }
+
+  /* dropdown positioning tweak on mobile */
+  .user-dropdown {
+    left: 52px;
+    top: 46px;
   }
 }

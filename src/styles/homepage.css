@@ -5,7 +5,7 @@
   height: 100vh;
   width: 100vw;
   overflow: hidden;
-  background: var(--bg-primary); 
+  background: var(--bg-primary);
 }
 
 /* === MAIN AREA === */
@@ -13,8 +13,8 @@
   flex: 1;
   height: 100vh;
   width: 100%;
-  background: var(--bg-primary); 
-  color: var(--text-primary); 
+  background: var(--bg-primary);
+  color: var(--text-primary);
   padding: 30px 60px;
   box-sizing: border-box;
   overflow-y: auto;
@@ -24,7 +24,7 @@
 /* === HEADER === */
 .dashboard-header {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
   position: relative;
   height: 90px;
@@ -77,17 +77,16 @@
 /* === LOGO === */
 .logo-container {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
-  filter: none; 
+  filter: none;
 }
 
 .logo {
   width: 300px;
   height: auto;
-  object-fit: contain;    
+  object-fit: contain;
 }
-
 
 /* === STATS CARDS === */
 .stats-grid {
@@ -105,22 +104,22 @@
   background: var(--bg-secondary);
   padding: 20px 0;
   border-radius: 14px;
-  border: 1px solid var(--border-color); 
+  border: 1px solid var(--border-color);
   text-align: center;
-  box-shadow: 0 4px 10px var(--shadow-color); 
+  box-shadow: 0 4px 10px var(--shadow-color);
   transition: all 0.25s ease;
 }
 
 .card:hover {
-  transform: translateY(-2px); 
-  box-shadow: 0 6px 15px var(--shadow-color); 
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px var(--shadow-color);
 }
 
 .card h3 {
   margin: 0;
   font-size: 15px;
   font-weight: 500;
-  color: var(--text-secondary); 
+  color: var(--text-secondary);
 }
 
 .card p {
@@ -131,16 +130,18 @@
 }
 
 /* === USAGE CHART / AGENT SECTION CONTAINERS === */
-.usage-card, .agent-section {
+.usage-card,
+.agent-section {
   background: var(--bg-secondary);
   border-radius: 16px;
   padding: 25px 30px;
   box-shadow: 0 4px 10px var(--shadow-color);
-  border: 1px solid var(--border-color); 
+  border: 1px solid var(--border-color);
   margin-bottom: 30px;
 }
 
-.usage-card h3, .agent-section h3 {
+.usage-card h3,
+.agent-section h3 {
   font-size: 18px;
   color: var(--text-primary);
   margin-bottom: 12px;
@@ -171,21 +172,86 @@
   font-size: 14px;
 }
 
-/* Agent row */
+/* --- Agent row (fix vertical alignment) --- */
 .agent-row {
   display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
+  align-items: center;          /* ✅ centers avatar + text vertically */
+  gap: 12px;
+  padding: 12px 0;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
 .agent-row:hover {
+  background: rgba(255, 255, 255, 0.04); /* better for dark mode */
+}
+
+body.light-mode .agent-row:hover {
   background: rgba(0, 0, 0, 0.03);
+}
+
+/* Left side (avatar + text) */
+.agent-left {
+  display: flex;
+  align-items: center;          /* ✅ centers text block with avatar */
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Avatar should never shrink */
+.agent-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex: 0 0 44px;               /* ✅ prevents squish/misalignment */
+}
+
+/* Text stack */
+.agent-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;      /* ✅ keeps it centered */
+  min-width: 0;
+}
+
+/* ✅ Kill default margins that cause the "lower" look */
+.agent-name,
+.agent-last-used {
+  margin: 0;
+  line-height: 1.2;
+}
+
+.agent-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.agent-last-used {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+
+/* ✅ THEME-AWARE HOVER FIX */
+body.light-mode .agent-row:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+body:not(.light-mode) .agent-row:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .agent-row:not(:last-child) {
   border-bottom: 1px solid var(--border-color);
+  border-radius: 0; /* keep clean separators between rows */
+  padding-left: 0;
+  padding-right: 0;
 }
 
 /* Left section */
@@ -193,6 +259,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 /* Avatar */
@@ -204,24 +271,32 @@
   align-items: center;
   justify-content: center;
   font-size: 20px;
+  flex: 0 0 auto;
 }
 
 /* Info */
 .agent-info {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .agent-name {
   font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .agent-last-used {
   font-size: 13px;
   color: var(--text-secondary);
   margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* View more */
@@ -242,7 +317,7 @@
 .settings-btn {
   position: absolute;
   right: 40px;
-  background: var(--bg-input); 
+  background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 10px;
@@ -258,12 +333,12 @@
 
 .settings-icon {
   font-size: 26px;
-  color: var(--text-primary); 
+  color: var(--text-primary);
 }
 
 /* === SCROLLBAR === */
 ::-webkit-scrollbar-thumb {
-  background-color: var(--border-color); 
+  background-color: var(--border-color);
   border-radius: 4px;
 }
 
@@ -272,12 +347,12 @@
 }
 
 .custom-tooltip {
-  background: #1f1f1f;        
-  color: #ffffff;              
+  background: #1f1f1f;
+  color: #ffffff;
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 13px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
 .custom-tooltip strong {
@@ -356,6 +431,7 @@
     flex-direction: column;
     gap: 6px;
     padding: 10px 0;
+    border-radius: 0;
   }
 }
 

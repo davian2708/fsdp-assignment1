@@ -43,6 +43,7 @@ body.light-mode .logo {
 .view-title {
   text-align: center;
   margin-bottom: 20px;
+  color: var(--text-primary);
 }
 
 /* --- SEARCH --- */
@@ -57,6 +58,10 @@ body.light-mode .logo {
   color: var(--text-primary);
   font-size: 16px;
   margin-bottom: 25px;
+}
+
+.view-search::placeholder {
+  color: var(--text-secondary);
 }
 
 /* --- FILTERS --- */
@@ -74,11 +79,23 @@ body.light-mode .logo {
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.filter-btn:hover {
+  background: var(--bg-hover);
 }
 
 .filter-btn.active {
   background: var(--text-primary);
   color: var(--bg-primary);
+}
+
+/* ✅ Dark mode: keep active pill readable (light pill, dark text) */
+body:not(.light-mode) .filter-btn.active {
+  background: rgba(255, 255, 255, 0.92);
+  color: #111;
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 /* --- AGENT GRID --- */
@@ -100,13 +117,27 @@ body.light-mode .logo {
   align-items: center;
   gap: 18px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.2s ease, border-color 0.2s ease;
 }
 
+/* ✅ Fix hover (was var(--border-color) which can look wrong in dark mode) */
 .agent-card:hover {
-  background: var(--border-color);
+  background: var(--bg-hover);
+  border-color: var(--border-color);
 }
 
+/* ✅ Dark mode: make cards "sidebar-like" (not pure black, not white) */
+body:not(.light-mode) .agent-card {
+  background: rgba(255, 255, 255, 0.06);  /* soft dark panel */
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+body:not(.light-mode) .agent-card:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Icon container */
 .agent-image-box {
   width: 90px;
   height: 90px;
@@ -117,12 +148,20 @@ body.light-mode .logo {
   justify-content: center;
 }
 
+/* ✅ Dark mode: icon box shouldn’t look like a light card */
+body:not(.light-mode) .agent-image-box {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
 .agent-img {
   font-size: 40px;
 }
 
+/* ✅ Text fixes (prevents “disappearing” names) */
 .agent-info h3 {
   margin: 0;
+  color: var(--text-primary);
 }
 
 .agent-info p {
@@ -141,6 +180,10 @@ body.light-mode .logo {
   color: var(--text-secondary);
   cursor: pointer;
   z-index: 2;
+}
+
+.agent-settings:hover {
+  color: var(--text-primary);
 }
 
 /* --- STATUS BADGE (Enable / Disable) --- */
@@ -185,7 +228,6 @@ body.light-mode .logo {
 .agent-delete:hover {
   color: #dc2626;
 }
-
 
 /* --- MOBILE & SMALL TABLETS --- */
 @media (max-width: 768px) {
