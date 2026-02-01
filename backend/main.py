@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routes.agent import router as agent_router
 from .routes.chat import router as chat_router
+from .routes.help import router as help_router
 from .routes.feedback import router as feedback_router
 from .routes.kb import router as kb_router
 from .routes.responses import router as responses_router
@@ -29,6 +30,7 @@ app.add_middleware(
 
 app.include_router(agent_router, prefix="/agents")
 app.include_router(chat_router, prefix="/chat")
+app.include_router(help_router, prefix="/help")
 app.include_router(feedback_router, prefix="/feedback")
 app.include_router(kb_router, prefix="/kb")
 app.include_router(responses_router, prefix="/responses")

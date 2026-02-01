@@ -405,3 +405,58 @@
     gap: 32px;
   }
 }
+
+/* === MAILBOX BUTTON + BADGE (INVITE COUNT) === */
+
+.mailbox-btn {
+  position: absolute;
+  right: 92px; /* sits left of settings icon (settings is right:40px) */
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  box-shadow: 0 0 8px var(--shadow-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mailbox-btn:hover {
+  background: var(--border-color);
+}
+
+/* 🔴 Red badge on top-right of mailbox icon */
+.mailbox-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+
+  border: 2px solid var(--bg-primary); /* layered look */
+}
+
+/* Responsive tweak: keep mail icon aligned on mobile */
+@media (max-width: 640px) {
+  .mailbox-btn {
+    right: 56px;
+    top: 12px;
+    padding: 8px;
+  }
+}

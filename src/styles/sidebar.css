@@ -15,6 +15,7 @@
 /* === USER SECTION === */
 
 .user-profile {
+  position: relative; /* ✅ anchors dropdown to the user block */
   display: flex;
   align-items: center;
   margin-bottom: 28px;
@@ -34,6 +35,17 @@
 .user-profile p {
   font-size: 15px;
   font-weight: 500;
+  margin: 0;
+}
+
+/* Optional: if you're using a button for the email */
+.user-email-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
 }
 
 /* === CREATE BUTTON === */
@@ -47,7 +59,7 @@
   padding: 12px;
   width: 100%;
   cursor: pointer;
-  margin-bottom: 24px;
+  margin-bottom: 12px; /* ✅ better spacing when you have 2 create buttons */
   transition: background 0.2s ease;
 }
 
@@ -88,6 +100,10 @@
 
 .chat-history {
   margin-top: 24px;
+  max-height: 60vh; /* limits height */
+  overflow-y: auto; /* enables vertical scroll */
+  padding-right: 6px; /* space for scrollbar */
+  scroll-behavior: smooth;
 }
 
 .history-title {
@@ -124,11 +140,99 @@
 }
 
 .history-more {
+  position: relative;
+  cursor: pointer;
   opacity: 0;
 }
 
 .history-item:hover .history-more {
   opacity: 1;
+}
+
+.history-dropdown {
+  position: absolute;
+  right: 0;
+  top: 22px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  min-width: 120px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+  z-index: 999;
+  overflow: hidden;
+}
+
+.history-dropdown button {
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.history-dropdown button:hover {
+  background: var(--bg-hover);
+}
+
+.history-dropdown .danger {
+  color: #ef4444;
+}
+
+/* Scrollbar */
+.chat-history::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-history::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-history::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.chat-history::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+/* === LOGOUT DROPDOWN (COMPACT) === */
+
+.user-dropdown {
+  position: absolute;
+  top: 46px;
+  left: 52px;              /* ✅ aligns under email text (icon is ~40px + gap) */
+  width: auto;             /* ✅ not full width */
+  min-width: 110px;        /* ✅ small menu */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 4px;
+  z-index: 60;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.user-dropdown-item {
+  width: 100%;
+  padding: 6px 10px;       /* ✅ smaller button */
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;         /* ✅ smaller text */
+  border-radius: 6px;
+  color: var(--text-primary);
+}
+
+.user-dropdown-item:hover {
+  background: var(--bg-hover);
+}
+
+.user-dropdown-item.danger {
+  color: #d11a2a;
 }
 
 /* === MOBILE === */
@@ -185,71 +289,10 @@
     border: none;
     margin-bottom: 12px;
   }
-}
 
-.history-more {
-  position: relative;
-  cursor: pointer;
+  /* dropdown positioning tweak on mobile */
+  .user-dropdown {
+    left: 52px;
+    top: 46px;
+  }
 }
-
-.history-dropdown {
-  position: absolute;
-  right: 0;
-  top: 22px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  min-width: 120px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
-  z-index: 999;
-  overflow: hidden;
-}
-
-.history-dropdown button {
-  width: 100%;
-  padding: 8px 12px;
-  background: none;
-  border: none;
-  color: var(--text-primary);
-  text-align: left;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.history-dropdown button:hover {
-  background: var(--bg-hover);
-}
-
-.history-dropdown .danger {
-  color: #ef4444;
-}
-
-/* Chat history container */
-.chat-history {
-  max-height: 60vh;          /* limits height */
-  overflow-y: auto;          /* enables vertical scroll */
-  padding-right: 6px;        /* space for scrollbar */
-}
-
-/* Optional: smoother scrolling */
-.chat-history {
-  scroll-behavior: smooth;
-}
-
-.chat-history::-webkit-scrollbar {
-  width: 6px;
-}
-
-.chat-history::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.chat-history::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-}
-
-.chat-history::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.35);
-}
-
