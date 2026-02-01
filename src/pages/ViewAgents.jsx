@@ -41,16 +41,21 @@ export default function ViewAgents() {
         // If it does, remove orderBy line.
         const q = query(
           collection(db, "agents"),
-          where("owner", "==", currentUser),
-          orderBy("createdAt", "desc")
+          where("owner", "==", currentUser)
         );
 
         const snapshot = await getDocs(q);
 
-        const list = snapshot.docs.map((d) => ({
-          id: d.id,
-          ...d.data(),
-        }));
+        const list = snapshot.docs
+          .map((d) => ({
+            id: d.id,
+            ...d.data(),
+          }))
+          .sort((a, b) => {
+            const aTime = a.createdAt?.toMillis?.() ?? 0;
+            const bTime = b.createdAt?.toMillis?.() ?? 0;
+            return bTime - aTime;
+          });
 
         setAgents(list);
       } catch (err) {
