@@ -87,7 +87,7 @@
   padding: 10px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-primary);
+  color: #000;
   cursor: pointer;
   transition: background 0.15s ease;
 }
