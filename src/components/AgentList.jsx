@@ -1,79 +1,73 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "../styles/homepage.css";
+import { useNavigate } from "react-router-dom";
 
-// Firebase
 import { db } from "../firebase";
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  limit,
-} from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 
 export default function AgentList() {
-  const [agents, setAgents] = useState([]);
   const navigate = useNavigate();
 
+  const currentUser = localStorage.getItem("currentUser"); // email
+  const [agents, setAgents] = useState([]);
+
   useEffect(() => {
-    const fetchRecentAgents = async () => {
-      const q = query(
-        collection(db, "agents"),
-        orderBy("lastUsedAt", "desc"),
-        limit(5)
-      );
+    if (!currentUser) return;
 
-      const snap = await getDocs(q);
-      const data = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    async function fetchAgents() {
+      const snapshot = await getDocs(collection(db, "agents"));
 
-      setAgents(data);
-    };
+      // ✅ match against multiple possible owner fields
+      const userAgents = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((agent) => {
+          const ownerLike =
+            agent.owner || agent.createdBy || agent.userEmail || agent.email || agent.userId;
+          return ownerLike === currentUser;
+        });
 
-    fetchRecentAgents();
-  }, []);
+      // show recent 5 (you can sort by createdAt/lastUsedAt if present)
+      setAgents(userAgents.slice(0, 5));
+    }
+
+    fetchAgents();
+  }, [currentUser]);
+
+  if (!currentUser) {
+    return (
+      <p style={{ color: "#6b7280" }}>
+        Please sign in to view your agents.
+      </p>
+    );
+  }
 
   return (
-    <div className="agent-list">
-      <h3 className="section-title">Recent AI Agents</h3>
+    <div className="agent-section">
+      <h3>Recent AI Agents</h3>
 
       {agents.length === 0 ? (
-        <p className="empty-text">No agents found.</p>
+        <p style={{ color: "#6b7280" }}>No agents created yet.</p>
       ) : (
-        agents.map((agent) => (
-          <div
-            key={agent.id}
-            className="agent-row"
-            onClick={() => navigate(`/agent-chat/${agent.id}`)}
-          >
-            <div className="agent-left">
-              <div
-                className="agent-avatar"
-                style={{ backgroundColor: agent.color }}
+        <div className="agent-list">
+          {agents.map((agent) => (
+            <div
+              key={agent.id}
+              className="agent-row"
+              onClick={() => navigate(`/agent-chat/${agent.id}`)}
+              style={{ cursor: "pointer" }}
+            >
+              <span>{agent.name || "(Unnamed Agent)"}</span>
+              <span
+                className={
+                  agent.isActive === false
+                    ? "agent-status idle"
+                    : "agent-status active"
+                }
               >
-                {agent.icon || "🤖"}
-              </div>
-
-              <div className="agent-info">
-                <div className="agent-name">{agent.name}</div>
-                <div className="agent-last-used">
-                  Last used{" "}
-                  {agent.lastUsedAt
-                    ? agent.lastUsedAt.toDate().toLocaleDateString()
-                    : "—"}
-                </div>
-              </div>
+                {agent.isActive === false ? "Disabled" : "Active"}
+              </span>
             </div>
-          </div>
-        ))
-      )}
-
-      {agents.length > 0 && (
-        <div className="more" onClick={() => navigate("/agents")}>
-          View all agents
+          ))}
         </div>
       )}
     </div>

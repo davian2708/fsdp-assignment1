@@ -1,17 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiSettings, FiX } from "react-icons/fi";
 import Sidebar from "../components/SideBar";
 import { useNavigate } from "react-router-dom";
 import EmojiPicker from "emoji-picker-react";
 import { HexColorPicker } from "react-colorful";
 import "../styles/createagent.css";
-import logo from '../assets/Flying Bot Logo.png';
+import logo from "../assets/Flying Bot Logo.png";
 
 import { db } from "../firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 
 export default function CreateAgentPage() {
   const navigate = useNavigate();
+
+  // 🔐 Logged-in user (email from SignIn.jsx)
+  const currentUser = localStorage.getItem("currentUser");
 
   const [showModal, setShowModal] = useState(false);
   const [selectedEmoji, setSelectedEmoji] = useState("🤖");
@@ -23,50 +33,108 @@ export default function CreateAgentPage() {
   const [guidelines, setGuidelines] = useState("");
   const [agentName, setAgentName] = useState("");
 
-  const handleLogoClick = () => navigate("/");
+  // tools dropdown (your original select didn't save anything)
+  const [selectedTool, setSelectedTool] = useState("");
+
+  // If user came from GroupAISelector "Create new AI"
+  const pendingGroupId = localStorage.getItem("pendingGroupForNewAI") || null;
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/signin");
+    }
+  }, [currentUser, navigate]);
+
+  const handleLogoClick = () => navigate("/home");
 
   const handleAddSpecialty = () => {
-    if (newSpecialty.trim()) {
-      setSpecialties([...specialties, newSpecialty.trim()]);
+    const clean = newSpecialty.trim();
+    if (!clean) return;
+
+    // prevent duplicates (case-insensitive)
+    const exists = specialties.some((s) => s.toLowerCase() === clean.toLowerCase());
+    if (exists) {
       setNewSpecialty("");
       setShowInput(false);
+      return;
     }
+
+    setSpecialties([...specialties, clean]);
+    setNewSpecialty("");
+    setShowInput(false);
   };
 
   const handleRemoveSpecialty = (index) => {
     setSpecialties(specialties.filter((_, i) => i !== index));
   };
 
-  //  Create agent in FIREBASE (NOT FastAPI)
   const handleCreateAgent = async () => {
-    if (!agentName || !summary || !guidelines) {
+    if (!currentUser) {
+      alert("Please sign in first.");
+      navigate("/signin");
+      return;
+    }
+
+    if (!agentName.trim() || !summary.trim() || !guidelines.trim()) {
       alert("Please fill in all required fields.");
       return;
     }
 
     try {
       const agentData = {
-        name: agentName,
-        summary: summary,
-        persona: guidelines,
-        specialties: specialties,
+        name: agentName.trim(),
+        summary: summary.trim(),
+        persona: guidelines.trim(),
+        specialties,
         icon: selectedEmoji,
         color: selectedColor,
-        tools: [],
+
+        // ✅ THIS FIXES "owned agents"
+        owner: currentUser,
+
+        // optional metadata
+        tools: selectedTool ? [selectedTool] : [],
         createdAt: serverTimestamp(),
+        lastUsedAt: serverTimestamp(),
         isActive: true,
       };
 
-      // Save to Firestore
-      const docRef = await addDoc(collection(db, "agents"), agentData);
+      // Save agent
+      const agentDocRef = await addDoc(collection(db, "agents"), agentData);
 
+      // ✅ If created from a group: add this agent to that group's aiAgents + set activeAgentId
+      if (pendingGroupId) {
+        const groupRef = doc(db, "groupChats", pendingGroupId);
+        const groupSnap = await getDoc(groupRef);
+
+        if (groupSnap.exists()) {
+          const groupData = groupSnap.data();
+          const existing = groupData.aiAgents || [];
+
+          const updatedAiAgents = Array.from(new Set([...existing, agentDocRef.id]));
+
+          await updateDoc(groupRef, {
+            aiAgents: updatedAiAgents,
+            activeAgentId: agentDocRef.id,
+            updatedAt: serverTimestamp(),
+          });
+        }
+
+        // clear the pending flag and go back to the group
+        localStorage.removeItem("pendingGroupForNewAI");
+
+        alert("Agent created and added to group!");
+        setShowModal(false);
+        navigate(`/group-chat/${pendingGroupId}`);
+        return;
+      }
+
+      // normal flow: go to 1-1 chat
       alert("Agent created successfully!");
       setShowModal(false);
-
-      // Redirect to chat with Firestore agent ID
-      navigate(`/agent-chat/${docRef.id}`);
+      navigate(`/agent-chat/${agentDocRef.id}`);
     } catch (error) {
-      console.error(" Error creating agent:", error);
+      console.error("Error creating agent:", error);
       alert("Failed to create agent.");
     }
   };
@@ -79,13 +147,10 @@ export default function CreateAgentPage() {
         {/* Header */}
         <div className="dashboard-header">
           <div className="logo-container" onClick={handleLogoClick}>
-            <img 
-              src={logo} 
-              alt="Logo" 
-              className="logo" 
-            />
+            <img src={logo} alt="Logo" className="logo" />
           </div>
-          <button className="settings-btn">
+
+          <button className="settings-btn" type="button">
             <FiSettings className="settings-icon" />
           </button>
         </div>
@@ -106,6 +171,7 @@ export default function CreateAgentPage() {
               className="icon-preview-btn"
               style={{ backgroundColor: selectedColor }}
               onClick={() => setShowModal(true)}
+              type="button"
             >
               <span className="icon-symbol">{selectedEmoji}</span>
             </button>
@@ -128,7 +194,7 @@ export default function CreateAgentPage() {
             <p>This agent specializes in</p>
 
             {!showInput ? (
-              <button className="add-btn" onClick={() => setShowInput(true)}>
+              <button className="add-btn" onClick={() => setShowInput(true)} type="button">
                 + Add
               </button>
             ) : (
@@ -139,7 +205,7 @@ export default function CreateAgentPage() {
                   onChange={(e) => setNewSpecialty(e.target.value)}
                   placeholder="e.g. Cooking"
                 />
-                <button className="save-tag-btn" onClick={handleAddSpecialty}>
+                <button className="save-tag-btn" onClick={handleAddSpecialty} type="button">
                   Add
                 </button>
               </div>
@@ -150,17 +216,12 @@ export default function CreateAgentPage() {
             {specialties.map((item, index) => (
               <div key={index} className="tag">
                 <span>{item}</span>
-                <FiX
-                  className="remove-tag"
-                  onClick={() => handleRemoveSpecialty(index)}
-                />
+                <FiX className="remove-tag" onClick={() => handleRemoveSpecialty(index)} />
               </div>
             ))}
           </div>
 
-          <label>
-            Define your agent’s role, personality, and behavior guidelines.
-          </label>
+          <label>Define your agent’s role, personality, and behavior guidelines.</label>
           <div className="input-with-counter textarea-wrapper">
             <textarea
               maxLength="500"
@@ -172,25 +233,23 @@ export default function CreateAgentPage() {
           </div>
 
           <label>Assign tools that your agent can access.</label>
-          <select>
-            <option>Select tool...</option>
-            <option>Database</option>
-            <option>Chat Interface</option>
-            <option>Web Scraper</option>
+          <select value={selectedTool} onChange={(e) => setSelectedTool(e.target.value)}>
+            <option value="">Select tool...</option>
+            <option value="Database">Database</option>
+            <option value="Chat Interface">Chat Interface</option>
+            <option value="Web Scraper">Web Scraper</option>
           </select>
 
-          <button className="create-btn" onClick={handleCreateAgent}>
+          <button className="create-btn" onClick={handleCreateAgent} type="button">
             Create Agent
           </button>
         </div>
 
         {/* ICON PICKER MODAL */}
-                {/* === ICON PICKER MODAL === */}
         {showModal && (
           <div className="modal-overlay" onClick={() => setShowModal(false)}>
             <div className="modal" onClick={(e) => e.stopPropagation()}>
               <h3>Select Icon & Colour</h3>
-
 
               <EmojiPicker
                 onEmojiClick={(emoji) => setSelectedEmoji(emoji.emoji)}
@@ -202,13 +261,10 @@ export default function CreateAgentPage() {
 
               <div className="color-picker">
                 <p>Pick a background color:</p>
-                <HexColorPicker
-                  color={selectedColor}
-                  onChange={setSelectedColor}
-                />
+                <HexColorPicker color={selectedColor} onChange={setSelectedColor} />
               </div>
 
-              <button className="save-btn" onClick={() => setShowModal(false)}>
+              <button className="save-btn" onClick={() => setShowModal(false)} type="button">
                 Save
               </button>
             </div>

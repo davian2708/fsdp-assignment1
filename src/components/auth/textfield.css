@@ -1,0 +1,67 @@
+.auth-shell {
+  --text: #111111;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+}
+
+.tf{
+  margin-bottom: 14px;
+}
+
+.tf-label{
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.tf-wrap{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.tf-wrap:focus-within{
+  border-color: rgba(0,0,0,0.55);
+  box-shadow: 0 0 0 4px rgba(0,0,0,0.06);
+}
+
+.tf-wrap--error{
+  border-color: rgba(220, 38, 38, 0.55);
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.08);
+}
+
+.tf-input{
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  color: var(--text);
+  background: transparent;
+}
+
+.tf-input::placeholder{
+  color: rgba(0,0,0,0.35);
+}
+
+.tf-right{
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.tf-error{
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgb(220, 38, 38);
+  min-height: 16px;
+}
+
+.tf-helper{
+  min-height: 16px;
+}
