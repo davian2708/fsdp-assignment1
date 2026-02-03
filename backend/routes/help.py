@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from firebase_admin import firestore
 
-from .. import db as db_layer
+import db as db_layer
 
 load_dotenv()
 router = APIRouter()
@@ -166,7 +166,7 @@ async def route_help(req: HelpRouteRequest):
         persona = "You are a helpful assistant. Be clear, friendly, and practical."
 
     # Use auto-id document so it matches frontend expectations
-    from ..firebase_admin_init import db as admin_db
+    from firebase_admin_init import db as admin_db
     doc_ref = admin_db.collection("agents").document()
     agent_id = doc_ref.id
 
