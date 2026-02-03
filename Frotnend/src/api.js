@@ -1,8 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL;
-
-if (!API_BASE_URL) {
-  throw new Error("VITE_API_URL is not defined");
-}
+const API_BASE_URL = process.env.REACT_APP_API_URL;
 //const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjE3OTQ1NzU5ODN9.baZmdIL7LBNHU34uAokJ5j-D563yJbWu_VwY8iMjDGM";
 
 // ===== AGENT ENDPOINTS =====
@@ -295,3 +291,5 @@ export async function getAgentChains(agentId) {
   if (!res.ok) throw new Error("Failed to fetch agent chains");
   return res.json();
 }
+
+console.log("VITE_API_URL =", import.meta.env.VITE_API_URL);
