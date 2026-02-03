@@ -16,14 +16,10 @@ cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
 
 app = FastAPI(title="AI Agent Engine - Lightweight")
 
-# Add CORS middleware to allow frontend requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
