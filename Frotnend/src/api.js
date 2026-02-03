@@ -1,7 +1,7 @@
-const API_BASE_URL = process.env.REACT_APP_API_URL;
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 if (!API_BASE_URL) {
-  throw new Error("REACT_APP_API_URL is not defined");
+  throw new Error("VITE_API_URL is not defined");
 }
 //const API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0ZXIiLCJleHAiOjE3OTQ1NzU5ODN9.baZmdIL7LBNHU34uAokJ5j-D563yJbWu_VwY8iMjDGM";
 
@@ -11,7 +11,7 @@ export async function createAgent(agentData) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      
     },
     body: JSON.stringify(agentData),
   });
@@ -29,7 +29,7 @@ export async function routeHelpRequest(prompt) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      
     },
     body: JSON.stringify({ prompt }),
   });
@@ -45,7 +45,7 @@ export async function routeHelpRequest(prompt) {
 
 export async function listAgents() {
   const res = await fetch(`${API_BASE_URL}/agents`, {
-    headers: { "x-api-key": API_KEY },
+    
   });
 
   if (!res.ok) throw new Error("Failed to fetch agents");
@@ -88,7 +88,7 @@ export async function submitFeedback(chatId, messageId, agentId, feedbackType, u
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      
     },
     body: JSON.stringify({
       chat_id: chatId,
@@ -105,7 +105,7 @@ export async function submitFeedback(chatId, messageId, agentId, feedbackType, u
 
 export async function getAgentFeedback(agentId) {
   const res = await fetch(`${API_BASE_URL}/feedback/agent/${agentId}`, {
-    headers: { "x-api-key": API_KEY },
+   
   });
 
   if (!res.ok) throw new Error("Failed to fetch feedback");
@@ -114,7 +114,7 @@ export async function getAgentFeedback(agentId) {
 
 export async function getFeedbackStats(agentId) {
   const res = await fetch(`${API_BASE_URL}/feedback/stats/${agentId}`, {
-    headers: { "x-api-key": API_KEY },
+    
   });
 
   if (!res.ok) throw new Error("Failed to fetch feedback stats");
@@ -127,7 +127,7 @@ export async function uploadKBDocument(agentId, content, sourceType, metadata = 
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      
     },
     body: JSON.stringify({
       agent_id: agentId,
@@ -147,7 +147,7 @@ export async function uploadPDF(agentId, file) {
 
   const res = await fetch(`${API_BASE_URL}/kb/upload-pdf`, {
     method: "POST",
-    headers: { "x-api-key": API_KEY },
+    
     body: formData,
   });
 
@@ -160,7 +160,7 @@ export async function uploadText(agentId, content, fileName = "") {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      
     },
     body: JSON.stringify({
       agent_id: agentId,
@@ -181,7 +181,7 @@ export async function uploadFromURL(agentId, url) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      
     },
     body: JSON.stringify({
       agent_id: agentId,
@@ -202,7 +202,7 @@ export async function uploadFAQ(agentId, faqEntries) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      
     },
     body: JSON.stringify({
       agent_id: agentId,
@@ -216,7 +216,7 @@ export async function uploadFAQ(agentId, faqEntries) {
 
 export async function getAgentKB(agentId) {
   const res = await fetch(`${API_BASE_URL}/kb/agent/${agentId}`, {
-    headers: { "x-api-key": API_KEY },
+    
   });
 
   if (!res.ok) throw new Error("Failed to fetch KB documents");
@@ -229,7 +229,7 @@ export async function saveResponse(agentId, userMessage, botResponse, tags = [])
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      
     },
     body: JSON.stringify({
       agent_id: agentId,
@@ -250,7 +250,7 @@ export async function getSavedResponses(agentId, tags = null) {
   }
 
   const res = await fetch(url, {
-    headers: { "x-api-key": API_KEY },
+    
   });
 
   if (!res.ok) throw new Error("Failed to fetch saved responses");
@@ -263,7 +263,7 @@ export async function linkAgents(primaryAgentId, secondaryAgentId) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": API_KEY,
+      
     },
     body: JSON.stringify({
       primary_agent_id: primaryAgentId,
@@ -289,7 +289,7 @@ export async function queryAgentChain(body) {
 
 export async function getAgentChains(agentId) {
   const res = await fetch(`${API_BASE_URL}/chains/chains/${agentId}`, {
-    headers: { "x-api-key": API_KEY },
+    
   });
 
   if (!res.ok) throw new Error("Failed to fetch agent chains");
