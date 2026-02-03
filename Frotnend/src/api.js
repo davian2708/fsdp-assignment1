@@ -21,7 +21,7 @@ if (!API_BASE_URL) {
 }
 // ===== AGENT ENDPOINTS =====
 export async function createAgent(agentData) {
-  const res = await fetch(`${API_BASE_URL}/agents`, {
+  const res = await fetch(`${API_BASE_URL}/agents/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -58,13 +58,13 @@ export async function routeHelpRequest(prompt) {
 
 
 export async function listAgents() {
-  const res = await fetch(`${API_BASE_URL}/agents`, {
+  const res = await fetch(`${API_BASE_URL}/agents/`, {
   headers: {
     ...(await getAuthHeaders()),
   },
 });
 
-  if (!res.ok) throw new Error("Failed to fetch agents");
+  if (!res.ok) throw new Error("Failed to fetch agents/");
   return res.json();
 }
 
