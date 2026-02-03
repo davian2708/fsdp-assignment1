@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from .. import db
+import db
 import os
 import openai
 from openai import OpenAI
-from ..models import ChatRequest
+from models import ChatRequest
 from dotenv import load_dotenv
 import asyncio
 from fastapi import Response

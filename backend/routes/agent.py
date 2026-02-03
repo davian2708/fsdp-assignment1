@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from uuid import uuid4
-from ..models import AgentCreateRequest
-from .. import db
+from models import AgentCreateRequest
+import db
 
 router = APIRouter()
 

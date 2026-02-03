@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File
-from ..models import KnowledgeBaseUploadRequest, FaqBuilderRequest
-from .. import db
+from models import KnowledgeBaseUploadRequest, FaqBuilderRequest
+import db
 import PyPDF2
 from io import BytesIO
 
