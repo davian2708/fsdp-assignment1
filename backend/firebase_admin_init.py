@@ -1,13 +1,10 @@
-import os
+# backend/firebase_admin_init.py
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import firestore
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-cred_path = os.path.join(BASE_DIR, "firebase", "serviceaccount.json")
-
+# Initialize Firebase ONLY ONCE
 if not firebase_admin._apps:
-    cred = credentials.Certificate(cred_path)
-    firebase_admin.initialize_app(cred)
+    firebase_admin.initialize_app()
 
+# Firestore client (global, reused)
 db = firestore.client()
-
